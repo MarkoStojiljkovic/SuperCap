@@ -23,7 +23,7 @@
 #define _UARTBUFFER_h
 
 
-#define RECEIVE_BUFFER_SIZE 100 // This dictates max chars that are accepted in console
+#define RECEIVE_BUFFER_SIZE 300 // This dictates max chars that are accepted in console
 #define TRANSMIT_BUFFER_SIZE 400 // This should be bigger than RECEIVE_BUFFER_SIZE, because somethimes whole receiveBuffer needs to be sent
 
 

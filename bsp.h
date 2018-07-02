@@ -50,6 +50,9 @@
 #define FANOX_EN_PIN            LATDbits.LATD4 // pin 52, TP13
 #define RES_EN_PIN              LATDbits.LATD3 // pin 51, TP11
 
+
+// UART
+#define RS485_DIR               LATFbits.LATF3 // pin 33
 /*****************************************************************************
  * Global Function Prototypes
  *****************************************************************************/

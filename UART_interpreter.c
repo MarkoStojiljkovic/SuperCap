@@ -23,13 +23,6 @@
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
-#define DEV_ADDRESS 0x31
-#define MESSAGE_INFO_LEN 2
-#define CHECKSUM_LEN 2
-#define MAX_STRING_LENGTH 80
-#define START_SEQ 0xfe
-
-
 
 #include "UART_interpreter.h"
 #include <stdbool.h>
@@ -43,6 +36,15 @@
 #include "interrupts.h"
 #include "debuggerBuffer.h"
 #include "checksum.h"
+#include "delay.h"
+
+#define DEV_ADDRESS 0x31
+#define MESSAGE_INFO_LEN 2
+#define CHECKSUM_LEN 2
+#define MAX_STRING_LENGTH 80
+#define START_SEQ 0xfe
+#define ENABLE_DEBUG 1
+#define DEBUG_DIODE LED_BLUE
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
@@ -174,6 +176,9 @@ void SendNextCharUARTInterpreter()
   }
   else
   {
+    // Sending is finished, wait some time and then Set RS485 directional pin to input
+    Delay1ms(3);
+    RS485_DIR = 0; // Set RS485 directional pin to input
     // Reset write buffer
     currentCharPtrWrite = 0;
     totalCharsWrite = 0;
@@ -202,18 +207,17 @@ void UART_Interpreter_Timeout()
     // Reset state machine
     stateDR = STATE_START_CHECK;
     StopwatchStop(); // We are done with it for now
-    
-    // DEBUG
-    
-//    if(LED_GREEN == 1)
-//    {
-//      LED_GREEN = 0;
-//    }
-//    else
-//    {
-//      LED_GREEN = 1;
-//    }
+#if (ENABLE_DEBUG == 1)
+    if(DEBUG_DIODE == 1)
+    {
+        DEBUG_DIODE = 0;
+    }
+    else
+    {
+        DEBUG_DIODE = 1;
+    }
     DebuggerResetBuff(0);
+#endif
   }
 }
 

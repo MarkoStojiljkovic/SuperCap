@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include "UARTBuffer.h"
 #include "xc.h"
+#include "bsp.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
@@ -51,6 +52,7 @@ int totalCharsRead = 0; // Total number of chars
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
+// This buffer is filled with data received via UART
 void AppendCharToReceiveBuffer(char c)
 {
   if(totalCharsRead >= RECEIVE_BUFFER_SIZE)
@@ -86,6 +88,7 @@ void AppendStringToTransmitBuffer(char * c)
   if(totalCharsWrite == len + 1)
   {
     // if this is first char it needs to start sending manually
+    RS485_DIR = 1; // Set RS485 directional pin to output
     while(U1STAbits.TRMT==0);
     U1TXREG=transmitBuffer[0];
     currentCharPtrWrite++;
@@ -107,6 +110,7 @@ int AppendDataToTransmitBuffer(uint8_t * buff, uint16_t len)
   
   if(totalCharsWrite == len)
   {
+    RS485_DIR = 1; // Set RS485 directional pin to output
     // if this is first char it needs to start sending manually
     while(U1STAbits.TRMT==0);
     U1TXREG=transmitBuffer[0];
@@ -128,11 +132,11 @@ void AppendCharToTransmitBuffer(char c)
   transmitBuffer[totalCharsWrite++] = c;
   if(totalCharsWrite == 1 )
   {
+    RS485_DIR = 1; // Set RS485 directional pin to output
     // if this is first char it needs to start sending manually
     while(U1STAbits.TRMT==0);
     U1TXREG=transmitBuffer[0];
     currentCharPtrWrite++;
-    
   }
 }
 /*****************************************************************************

@@ -33,6 +33,7 @@
 #define CHANNEL_DATA_PERIOD 2
 
 #define DATA_REC_DEBUG_DIODES 1
+#define DEBUG_DIODE LED_GREEN
 // Dual channel sequence looks like pppVVpppCC , period is 10ms, p - delay, V - channel0, C - channel 1
 /*****************************************************************************
  * Declaration of Global Variables
@@ -72,6 +73,8 @@ static int _finished = 0; // When this flag is activated, save remaining data an
 static uint16_t _recordedPoints = 0; // Number of recorded data points
 static uint16_t _targetPoints = 0xFFFF; // Target points to which data will be recorded (only used in targetPoints mode)
 static uint16_t selectedChannel = 3; // Invalid starting value
+
+static int forceFirstSampleToBeFromCH0 = 1;
 
 // Initialization of state machines
 //static calc_state_t stateCalcu = STATE_INIT_CH;
@@ -126,7 +129,17 @@ void DataRecorderConfigAndRun(uint8_t chMode, uint8_t operationMode, uint32_t pr
         return;
     }
     selectedChannel = chMode;
-
+    
+    // If dual channel mode is selected force first sample in buffer to be from CH0
+    if(selectedChannel == CH_MODE_DUAL)
+    {
+        forceFirstSampleToBeFromCH0 = 1;
+    }
+    else
+    {
+        forceFirstSampleToBeFromCH0 = 0;
+    }
+        
     // Chose data recorder task function based on operation mode
     if (operationMode < 1 || operationMode > 2)
     {
@@ -200,7 +213,7 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
 {
     if (_enabled != 1) return;
     #if (DATA_REC_DEBUG_DIODES == 1)
-    LED_RED = 1;
+//    DEBUG_DIODE = 1;
     #endif
 
     if (_finished == 1) // This flag can be set only by commander
@@ -209,8 +222,8 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
         // flush buffers to FRAM _currentDataBufferIndex
         #if (DATA_REC_DEBUG_DIODES == 1)
         // Reset LEDs to original state
-        LED_RED = 0;
-        LED_BLUE = 0;
+//        LED_RED = 0;
+        DEBUG_DIODE = 0;
         #endif
         FRAMControllerPushWrite((uint8_t *) dataBuffPtr, _currentDataBufferIndex * 2); // Flush remaining data to FRAM
         FRAMCloseHeader(_recordedPoints);
@@ -222,6 +235,20 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
     }
     if ((selectedChannel == 2) || (selectedChannel == channel))
     {
+        // First sample in buffer must be CH0 (in dual channel mode)
+        if(selectedChannel == 2 && forceFirstSampleToBeFromCH0 ==1)
+        {
+            if(channel == 0)
+            {
+                forceFirstSampleToBeFromCH0 = 0;
+            }
+            else
+            {
+                // Its channel 1, skip
+                return;
+            }
+        }
+        
         if (_currentPrescalerVal < _prescalerValue)
         {
             _currentPrescalerVal++;
@@ -232,13 +259,13 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
             _currentPrescalerVal = 0;
             InsertInBufferNEW(rawData);
             #if (DATA_REC_DEBUG_DIODES == 1)
-            if (LED_BLUE == 1)
+            if (DEBUG_DIODE == 1)
             {
-                LED_BLUE = 0;
+                DEBUG_DIODE = 0;
             }
             else
             {
-                LED_BLUE = 1;
+                DEBUG_DIODE = 1;
             }
             #endif
         }
@@ -251,15 +278,15 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel)
     if (_enabled != 1) return;
 
     #if (DATA_REC_DEBUG_DIODES == 1)
-    LED_RED = 1;
+//    LED_RED = 1;
     #endif
 
     if (_recordedPoints == _targetPoints)
     {
         #if (DATA_REC_DEBUG_DIODES == 1)
         // Reset LEDs to original state
-        LED_RED = 0;
-        LED_BLUE = 0;
+//        LED_RED = 0;
+        DEBUG_DIODE = 0;
         #endif
         FRAMControllerPushWrite((uint8_t *) dataBuffPtr, _currentDataBufferIndex * 2); // Flush remaining data to FRAM
         FRAMCloseHeader(_recordedPoints);
@@ -272,6 +299,19 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel)
 
     if ((selectedChannel == 2) || (selectedChannel == channel))
     {
+        // First sample in buffer must be CH0 (in dual channel mode)
+        if(selectedChannel == 2 && forceFirstSampleToBeFromCH0 ==1)
+        {
+            if(channel == 0)
+            {
+                forceFirstSampleToBeFromCH0 = 0;
+            }
+            else
+            {
+                // Its channel 1, skip
+                return;
+            }
+        }
         if (_currentPrescalerVal < _prescalerValue)
         {
             _currentPrescalerVal++;
@@ -282,13 +322,13 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel)
             _currentPrescalerVal = 0;
             InsertInBufferNEW(rawData);
             #if (DATA_REC_DEBUG_DIODES == 1)
-            if (LED_BLUE == 1)
+            if (DEBUG_DIODE == 1)
             {
-                LED_BLUE = 0;
+                DEBUG_DIODE = 0;
             }
             else
             {
-                LED_BLUE = 1;
+                DEBUG_DIODE = 1;
             }
             #endif
         }

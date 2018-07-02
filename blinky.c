@@ -2,7 +2,7 @@
  * Copyright 2018 Netico
  *****************************************************************************
  *
- * Filename    : main.c
+ * Filename    : blinky.c
  *
  * Created By  : Marko
  *
@@ -22,69 +22,57 @@
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
-#include "globals.h"//global change
-#include "main.h"
-#include "komunikacija.h"
-#include "merenja.h"
-#include "init.h"
-#include "fram_driver.h"
-#include "rtc.h"
-#include "commander.h"
-#include "FRAM_Controller.h"
-#include "dataProvider.h"
 #include "blinky.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
+#define HALF_PERIOD_INTERVAL_IN_MS 1000
+#define LED LED_RED
 
+
+int32_t g_blinkyCounter = HALF_PERIOD_INTERVAL_IN_MS;
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
 
-
-
 /*****************************************************************************
  Local Function Prototypes - Same order as defined
  *****************************************************************************/
-void Clear_WDT (void);
+
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
-  
+
+// Blink selected LED, with selected period to display that device is working normaly
+void BlinkLEDDeviceStatus()
+{
+    static int state = 0;
+    
+    switch(state)
+    {
+        case 0:
+        {
+            if(g_blinkyCounter == 0)
+            {
+                state = 1;
+                g_blinkyCounter = HALF_PERIOD_INTERVAL_IN_MS;
+                LED = 1;
+            }
+            break;
+        }
+        case 1:
+        {
+            if(g_blinkyCounter == 0)
+            {
+                state = 0;
+                g_blinkyCounter = HALF_PERIOD_INTERVAL_IN_MS;
+                LED = 0;
+            }
+            break;
+        }
+        default: state = 0; // reset SM
+    }
+}
 /*****************************************************************************
  * Local Functions (Definitions)
  *****************************************************************************/
-int main(void) 
-{
-  //save reset flags for later examination and clear them in hw...
-  int RCONOnStartup = RCON;
-  RCONbits.TRAPR = 0;
-  RCONbits.IOPUWR = 0;
-  RCONbits.CM = 0;
-  RCONbits.EXTR = 0;
-  RCONbits.SWR = 0;
-  RCONbits.WDTO = 0;
-  RCONbits.SLEEP = 0;
-  RCONbits.IDLE = 0;
-  RCONbits.BOR = 0;
-  RCONbits.POR = 0;
-  RCONOnStartup = RCONOnStartup; // Dummy instruction to remove warning
-  
-  
-  Init();
-    while(1)
-    {
-      CommanderTask();
-      FRAMControllerWriteTask();
-      FRAMControllerReadTask();
-      DataProviderTask();
-      BlinkLEDDeviceStatus();
-      Clear_WDT();
-    }
-}
-
-// Separate function because optimization "issue" (according to forum )
-void Clear_WDT (void) 
-{
-     ClrWdt();
- }

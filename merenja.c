@@ -41,8 +41,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 {
     IFS0bits.T3IF = 0;
     
-    if(drzanje>0)
-        drzanje--;
+//    if(drzanje>0)
+//        drzanje--;
 
 
 

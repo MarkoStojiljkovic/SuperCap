@@ -44,12 +44,6 @@ else
 COMPARISON_BUILD=
 endif
 
-ifdef SUB_IMAGE_ADDRESS
-SUB_IMAGE_ADDRESS_COMMAND=--image-address $(SUB_IMAGE_ADDRESS)
-else
-SUB_IMAGE_ADDRESS_COMMAND=
-endif
-
 # Object Directory
 OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 
@@ -57,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c hardware.c komunikacija.c merenja.c init.c interrupts.c delay.c sigmaDeltaADC.c console.c consoleCommands.c i2c.c fram_driver.c rtc.c UART_interpreter.c stopwatch.c UARTBuffer.c commander.c dataRecorder.c FRAM_Controller.c dataProvider.c debuggerBuffer.c checksum.c chargerController.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c hardware.c komunikacija.c merenja.c init.c interrupts.c delay.c sigmaDeltaADC.c console.c consoleCommands.c i2c.c fram_driver.c rtc.c UART_interpreter.c stopwatch.c UARTBuffer.c commander.c dataRecorder.c FRAM_Controller.c dataProvider.c debuggerBuffer.c checksum.c chargerController.c blinky.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/hardware.o ${OBJECTDIR}/komunikacija.o ${OBJECTDIR}/merenja.o ${OBJECTDIR}/init.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/delay.o ${OBJECTDIR}/sigmaDeltaADC.o ${OBJECTDIR}/console.o ${OBJECTDIR}/consoleCommands.o ${OBJECTDIR}/i2c.o ${OBJECTDIR}/fram_driver.o ${OBJECTDIR}/rtc.o ${OBJECTDIR}/UART_interpreter.o ${OBJECTDIR}/stopwatch.o ${OBJECTDIR}/UARTBuffer.o ${OBJECTDIR}/commander.o ${OBJECTDIR}/dataRecorder.o ${OBJECTDIR}/FRAM_Controller.o ${OBJECTDIR}/dataProvider.o ${OBJECTDIR}/debuggerBuffer.o ${OBJECTDIR}/checksum.o ${OBJECTDIR}/chargerController.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/hardware.o.d ${OBJECTDIR}/komunikacija.o.d ${OBJECTDIR}/merenja.o.d ${OBJECTDIR}/init.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/delay.o.d ${OBJECTDIR}/sigmaDeltaADC.o.d ${OBJECTDIR}/console.o.d ${OBJECTDIR}/consoleCommands.o.d ${OBJECTDIR}/i2c.o.d ${OBJECTDIR}/fram_driver.o.d ${OBJECTDIR}/rtc.o.d ${OBJECTDIR}/UART_interpreter.o.d ${OBJECTDIR}/stopwatch.o.d ${OBJECTDIR}/UARTBuffer.o.d ${OBJECTDIR}/commander.o.d ${OBJECTDIR}/dataRecorder.o.d ${OBJECTDIR}/FRAM_Controller.o.d ${OBJECTDIR}/dataProvider.o.d ${OBJECTDIR}/debuggerBuffer.o.d ${OBJECTDIR}/checksum.o.d ${OBJECTDIR}/chargerController.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/hardware.o ${OBJECTDIR}/komunikacija.o ${OBJECTDIR}/merenja.o ${OBJECTDIR}/init.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/delay.o ${OBJECTDIR}/sigmaDeltaADC.o ${OBJECTDIR}/console.o ${OBJECTDIR}/consoleCommands.o ${OBJECTDIR}/i2c.o ${OBJECTDIR}/fram_driver.o ${OBJECTDIR}/rtc.o ${OBJECTDIR}/UART_interpreter.o ${OBJECTDIR}/stopwatch.o ${OBJECTDIR}/UARTBuffer.o ${OBJECTDIR}/commander.o ${OBJECTDIR}/dataRecorder.o ${OBJECTDIR}/FRAM_Controller.o ${OBJECTDIR}/dataProvider.o ${OBJECTDIR}/debuggerBuffer.o ${OBJECTDIR}/checksum.o ${OBJECTDIR}/chargerController.o ${OBJECTDIR}/blinky.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/hardware.o.d ${OBJECTDIR}/komunikacija.o.d ${OBJECTDIR}/merenja.o.d ${OBJECTDIR}/init.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/delay.o.d ${OBJECTDIR}/sigmaDeltaADC.o.d ${OBJECTDIR}/console.o.d ${OBJECTDIR}/consoleCommands.o.d ${OBJECTDIR}/i2c.o.d ${OBJECTDIR}/fram_driver.o.d ${OBJECTDIR}/rtc.o.d ${OBJECTDIR}/UART_interpreter.o.d ${OBJECTDIR}/stopwatch.o.d ${OBJECTDIR}/UARTBuffer.o.d ${OBJECTDIR}/commander.o.d ${OBJECTDIR}/dataRecorder.o.d ${OBJECTDIR}/FRAM_Controller.o.d ${OBJECTDIR}/dataProvider.o.d ${OBJECTDIR}/debuggerBuffer.o.d ${OBJECTDIR}/checksum.o.d ${OBJECTDIR}/chargerController.o.d ${OBJECTDIR}/blinky.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/hardware.o ${OBJECTDIR}/komunikacija.o ${OBJECTDIR}/merenja.o ${OBJECTDIR}/init.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/delay.o ${OBJECTDIR}/sigmaDeltaADC.o ${OBJECTDIR}/console.o ${OBJECTDIR}/consoleCommands.o ${OBJECTDIR}/i2c.o ${OBJECTDIR}/fram_driver.o ${OBJECTDIR}/rtc.o ${OBJECTDIR}/UART_interpreter.o ${OBJECTDIR}/stopwatch.o ${OBJECTDIR}/UARTBuffer.o ${OBJECTDIR}/commander.o ${OBJECTDIR}/dataRecorder.o ${OBJECTDIR}/FRAM_Controller.o ${OBJECTDIR}/dataProvider.o ${OBJECTDIR}/debuggerBuffer.o ${OBJECTDIR}/checksum.o ${OBJECTDIR}/chargerController.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/hardware.o ${OBJECTDIR}/komunikacija.o ${OBJECTDIR}/merenja.o ${OBJECTDIR}/init.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/delay.o ${OBJECTDIR}/sigmaDeltaADC.o ${OBJECTDIR}/console.o ${OBJECTDIR}/consoleCommands.o ${OBJECTDIR}/i2c.o ${OBJECTDIR}/fram_driver.o ${OBJECTDIR}/rtc.o ${OBJECTDIR}/UART_interpreter.o ${OBJECTDIR}/stopwatch.o ${OBJECTDIR}/UARTBuffer.o ${OBJECTDIR}/commander.o ${OBJECTDIR}/dataRecorder.o ${OBJECTDIR}/FRAM_Controller.o ${OBJECTDIR}/dataProvider.o ${OBJECTDIR}/debuggerBuffer.o ${OBJECTDIR}/checksum.o ${OBJECTDIR}/chargerController.o ${OBJECTDIR}/blinky.o
 
 # Source Files
-SOURCEFILES=main.c hardware.c komunikacija.c merenja.c init.c interrupts.c delay.c sigmaDeltaADC.c console.c consoleCommands.c i2c.c fram_driver.c rtc.c UART_interpreter.c stopwatch.c UARTBuffer.c commander.c dataRecorder.c FRAM_Controller.c dataProvider.c debuggerBuffer.c checksum.c chargerController.c
+SOURCEFILES=main.c hardware.c komunikacija.c merenja.c init.c interrupts.c delay.c sigmaDeltaADC.c console.c consoleCommands.c i2c.c fram_driver.c rtc.c UART_interpreter.c stopwatch.c UARTBuffer.c commander.c dataRecorder.c FRAM_Controller.c dataProvider.c debuggerBuffer.c checksum.c chargerController.c blinky.c
 
 
 CFLAGS=
@@ -255,6 +249,13 @@ ${OBJECTDIR}/chargerController.o: chargerController.c  nbproject/Makefile-${CND_
 	${MP_CC} $(MP_EXTRA_CC_PRE)  chargerController.c  -o ${OBJECTDIR}/chargerController.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/chargerController.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/chargerController.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/blinky.o: blinky.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/blinky.o.d 
+	@${RM} ${OBJECTDIR}/blinky.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  blinky.c  -o ${OBJECTDIR}/blinky.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/blinky.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/blinky.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -416,6 +417,13 @@ ${OBJECTDIR}/chargerController.o: chargerController.c  nbproject/Makefile-${CND_
 	@${RM} ${OBJECTDIR}/chargerController.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  chargerController.c  -o ${OBJECTDIR}/chargerController.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/chargerController.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/chargerController.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/blinky.o: blinky.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/blinky.o.d 
+	@${RM} ${OBJECTDIR}/blinky.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  blinky.c  -o ${OBJECTDIR}/blinky.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/blinky.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/blinky.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

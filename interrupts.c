@@ -43,6 +43,7 @@ typedef enum
 #include "dataRecorder.h"
 #include "debuggerBuffer.h"
 #include "chargerController.h"
+#include "blinky.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
@@ -81,9 +82,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
 //    counter = 0;
 //    InsertNewCharConsole('y');
 //  }
-  // TODO: Implement state machine for both channels here
   DelayTick();
   if(g_DelayCounter != 0) g_DelayCounter--;
+  if(g_blinkyCounter != 0) g_blinkyCounter--;
+  
   LastSyncAdcResult = SD1RESH;
   // ChargerControllTask(LastSyncAdcResult)
   StopwatchTick();
@@ -134,7 +136,12 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
       currentChannel = CHANNEL0;
       break;
     }
-    default: while(1); // freeze for now
+    default:
+    {
+        // This shouldn't happen but if it does, restart state machine
+        calcuState = STATE_INIT_CH;
+        break;
+    }
   }
   
   
@@ -156,7 +163,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 { 
   IFS0bits.U1RXIF = 0; // Clear TX Interrupt flag
   char temp = (char)U1RXREG;
-  DebuggerInsertInBuff(temp);
+//  DebuggerInsertInBuff(temp);
   
 #if USE_CONSOLE == 1
   InsertNewCharConsole(U1RXREG);

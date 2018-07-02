@@ -49,7 +49,15 @@
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
-_CONFIG1( FWDTEN_WDT_DIS & ICS_PGx2 & LPCFG_ON & JTAGEN_OFF )
+// WDT Prescaler Ratio Select:
+// FWPSA_PR32           1:32
+//
+// Watchdog Timer Postscaler Select:
+// WDTPS_PS2048         1:2,048
+// Watchdog is configured to timeout when device is stuck for 2 seconds, and is software controlled via RCONbits.SWDTEN bit
+
+
+_CONFIG1( FWDTEN_WDT_SW & FWPSA_PR32 & WDTPS_PS2048 & ICS_PGx2 & LPCFG_ON & JTAGEN_OFF )
 _CONFIG2( POSCMD_HS & OSCIOFCN_OFF & FNOSC_PRI & IESO_OFF )
 
 //#pragma config POSCMOD = HS   // Primary Oscillator Select (HS = crystal, EC = external clock input)
@@ -69,7 +77,7 @@ static void UartInit();
  *****************************************************************************/
 void Init()
 {
-//  RCONbits.SWDTEN=0;// Stop WDT
+  RCONbits.SWDTEN=1; // Enable WDT
   
   // OSCILATOR INIT
   OSCCONbits.COSC=0b010;//Primary Oscillator (XT, HS, EC)
@@ -131,7 +139,6 @@ void Init()
   TRISEbits.TRISE1 = OUTPUT; // SWITCH_10A_PIN
   TRISEbits.TRISE0 = OUTPUT; // SEL_MEASURE_100_10_PIN
   
-  
   // End port init -----------------------------------
   
   ANSB=0b0000000000000000;//B0,B1 nisu analogni ulazi
@@ -160,9 +167,9 @@ static void UartInit()
 {
   // ------------------------- UART
   // UART SEND/RECEIVE PIN
-  TRISFbits.TRISF3=0;//
-  LATFbits.LATF3=1;
-
+  TRISFbits.TRISF3= OUTPUT;
+  RS485_DIR = 0;
+  
   RPINR18bits.U1RXR=10;//RP10 je RX
   RPOR8bits.RP17R=3;//RP17 je TX
   U1BRG=107;//kada je BRGH=1 -> BR=Fcy/16(U1BRG+1) sada je (51dec) za 19230

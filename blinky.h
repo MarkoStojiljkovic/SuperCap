@@ -2,11 +2,11 @@
  * Copyright 2018 Netico
  *****************************************************************************
  *
- * Filename    : main.c
+ * Filename    : blinky.h
  *
  * Created By  : Marko
  *
- * Based On    :
+ * Based On    : 
  *
  * Hardware    :
  *
@@ -14,77 +14,39 @@
  *
  *****************************************************************************
  * $LastChangedDate:  $
- * $LastChangedRevision:  $
- * $LastChangedBy:  $
+ * $LastChangedRevision: $
+ * $LastChangedBy: $
  * $HeadURL:  $
  *****************************************************************************/
+
+#ifndef _BLINKY_h
+#define _BLINKY_h
 
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
-#include "globals.h"//global change
-#include "main.h"
-#include "komunikacija.h"
-#include "merenja.h"
-#include "init.h"
-#include "fram_driver.h"
-#include "rtc.h"
-#include "commander.h"
-#include "FRAM_Controller.h"
-#include "dataProvider.h"
-#include "blinky.h"
+#include "bsp.h"
+#include <stdint.h>
+/*****************************************************************************
+ * Project Specific Types
+ *****************************************************************************/
+
+
+/*****************************************************************************
+ * Global Function Prototypes
+ *****************************************************************************/
+void BlinkLEDDeviceStatus();
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
-
+extern int32_t g_blinkyCounter;
 /*****************************************************************************
- Declaration of File Scope Variables
+ * Macros
  *****************************************************************************/
 
-
-
 /*****************************************************************************
- Local Function Prototypes - Same order as defined
+ * Constants
  *****************************************************************************/
-void Clear_WDT (void);
-/*****************************************************************************
- * Global Functions (Definitions)
- *****************************************************************************/
-  
-/*****************************************************************************
- * Local Functions (Definitions)
- *****************************************************************************/
-int main(void) 
-{
-  //save reset flags for later examination and clear them in hw...
-  int RCONOnStartup = RCON;
-  RCONbits.TRAPR = 0;
-  RCONbits.IOPUWR = 0;
-  RCONbits.CM = 0;
-  RCONbits.EXTR = 0;
-  RCONbits.SWR = 0;
-  RCONbits.WDTO = 0;
-  RCONbits.SLEEP = 0;
-  RCONbits.IDLE = 0;
-  RCONbits.BOR = 0;
-  RCONbits.POR = 0;
-  RCONOnStartup = RCONOnStartup; // Dummy instruction to remove warning
-  
-  
-  Init();
-    while(1)
-    {
-      CommanderTask();
-      FRAMControllerWriteTask();
-      FRAMControllerReadTask();
-      DataProviderTask();
-      BlinkLEDDeviceStatus();
-      Clear_WDT();
-    }
-}
 
-// Separate function because optimization "issue" (according to forum )
-void Clear_WDT (void) 
-{
-     ClrWdt();
- }
+#endif
+
