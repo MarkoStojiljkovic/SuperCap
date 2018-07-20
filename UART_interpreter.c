@@ -44,7 +44,7 @@
 #define MAX_STRING_LENGTH 80
 #define START_SEQ 0xfe
 #define ENABLE_DEBUG 1
-#define DEBUG_DIODE LED_BLUE
+#define DEBUG_DIODE LED_YELLOW
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/

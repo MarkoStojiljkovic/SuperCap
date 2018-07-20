@@ -269,7 +269,7 @@ static void instructionLedON (void)//0
     }
     case 3:
     {
-      LED_BLUE = 1;
+      LED_YELLOW = 1;
       break;
     }
     default: break;
@@ -295,7 +295,7 @@ static void instructionLedOFF (void) //1
     }
     case 3:
     {
-      LED_BLUE = 0;
+      LED_YELLOW = 0;
       break;
     }
     default: break;

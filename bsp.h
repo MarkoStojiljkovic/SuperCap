@@ -34,22 +34,34 @@
 #define INPUT 1
 
 
-#define LED_RED LATEbits.LATE4
-#define LED_GREEN LATEbits.LATE5
-#define LED_BLUE LATEbits.LATE6
+#define LED_RED LATEbits.LATE1 // pin 61, LED1
+#define LED_GREEN LATEbits.LATE2 // pin 62 LED2
+#define LED_YELLOW LATEbits.LATE3  // pin 63 LED3 
 
 #define TP6_PIN LATBbits.LATB15
 
 // Charger control pins
-#define CHARGER_EN_PIN          LATDbits.LATD7 // pin 55, TP15
-#define SWITCH_100A_PIN         LATEbits.LATE2 // pin 62, TP18
-#define DISCH_EN_PIN            LATEbits.LATE3 // pin 63, TP19
-#define SWITCH_10A_PIN          LATEbits.LATE1 // pin 61, TP17
-#define REF_100_10_PIN          LATEbits.LATE0 // pin 60, TP16
-#define SEL_MEASURE_100_10_PIN  LATDbits.LATD5 // pin 53, TP14
-#define FANOX_EN_PIN            LATDbits.LATD4 // pin 52, TP13
-#define RES_EN_PIN              LATDbits.LATD3 // pin 51, TP11
+#define CHARGER_EN_PIN          LATEbits.LATE4 // pin 64 , TP15
+#define SWITCH_100A_PIN         LATEbits.LATE6 // pin 2, TP na otporniku R76 gornji graj
+#define DISCH_EN_PIN            LATBbits.LATB2 // pin 14, TP na J4 jumper
+#define SWITCH_10A_PIN          LATEbits.LATE5 // pin 1, TP na R77
+#define REF_100_10_PIN          LATBbits.LATB1 // pin 15, TP na J3 jumper
+#define SEL_MEASURE_100_10_PIN  LATBbits.LATB0 // pin 16, TP ./.
+#define FANOX_EN_PIN            LATBbits.LATB3 // pin 13, TP J6 jumper i TP7
+#define RES_EN_PIN              LATEbits.LATE7 // pin 3, TP9 i J8
 
+#define ODRZAVANJE              LATDbits.LATD8 // pin 42, TP R83, R82
+
+
+// DEV ID PINS
+#define ADDR0                   LATDbits.LATD0 // pin 46
+#define ADDR1                   LATDbits.LATD2 // pin 50
+#define ADDR2                   LATDbits.LATD3 // pin 51
+#define ADDR3                   LATDbits.LATD4 // pin 52
+#define ADDR4                   LATDbits.LATD5 // pin 53
+#define ADDR5                   LATDbits.LATD6 // pin 54
+#define ADDR6                   LATDbits.LATD7 // pin 55
+#define ADDR7                   LATEbits.LATE0 // pin 60
 
 // UART
 #define RS485_DIR               LATFbits.LATF3 // pin 33
