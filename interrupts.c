@@ -31,8 +31,8 @@ typedef enum
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
+#include "globals.h"
 #include "interrupts.h"
-#include <xc.h>
 #include "delay.h"
 #include "sigmaDeltaADC.h"
 #include "console.h"
@@ -85,6 +85,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
   DelayTick();
   if(g_DelayCounter != 0) g_DelayCounter--;
   if(g_blinkyCounter != 0) g_blinkyCounter--;
+  if(g_failSafeChargeDelay != 0) g_failSafeChargeDelay--;
+  if(g_failSafeDischargeDelay != 0) g_failSafeDischargeDelay--;
   
   LastSyncAdcResult = SD1RESH;
   // ChargerControllTask(LastSyncAdcResult)

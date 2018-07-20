@@ -46,7 +46,8 @@
 /*****************************************************************************
  Local Function Prototypes - Same order as defined
  *****************************************************************************/
-void Clear_WDT (void);
+static void Clear_WDT (void);
+static void FailSafeTask();
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
@@ -74,6 +75,7 @@ int main(void)
   Init();
     while(1)
     {
+      FailSafeTask();
       CommanderTask();
       FRAMControllerWriteTask();
       FRAMControllerReadTask();
@@ -84,7 +86,77 @@ int main(void)
 }
 
 // Separate function because optimization "issue" (according to forum )
-void Clear_WDT (void) 
+static void Clear_WDT (void) 
 {
      ClrWdt();
- }
+}
+
+#define TIME_BETWEEN_STAGES_IN_MS 200
+// SM for disabling charging/discharging 
+static int disableDischargingSM = 0;
+static int disableChargingSM = 0;
+int g_failSafeChargeDelay = TIME_BETWEEN_STAGES_IN_MS;
+int g_failSafeDischargeDelay = TIME_BETWEEN_STAGES_IN_MS;
+
+static void FailSafeTask()
+{
+    // Discharger state machine
+    switch(disableDischargingSM)
+    {
+        case 0:
+        {
+            if(g_DisableDischarger != 0)
+            {
+                // Disable S1
+                SWITCH_100A_PIN = 0;
+                SWITCH_10A_PIN = 0;
+                disableDischargingSM = 1;
+                g_failSafeDischargeDelay = TIME_BETWEEN_STAGES_IN_MS;
+            }
+            break;
+        }
+        case 1:
+        {
+            // When timeout go to next state
+            if(g_failSafeDischargeDelay != 0) break;
+            disableDischargingSM = 2;
+            break;
+        }
+        case 2:
+        {
+            // Disable S2
+            DISCH_EN_PIN = 1; // Complementary logic
+            disableDischargingSM = 0;
+            break;
+        }
+    }
+    
+    // Charger state machine
+    switch(disableChargingSM)
+    {
+        case 0:
+        {
+            if(g_DisableCharger != 0)
+            {
+                // Disable S1
+                disableChargingSM = 1;
+                g_failSafeChargeDelay = TIME_BETWEEN_STAGES_IN_MS;
+                CHARGER_EN_PIN = 0;
+            }
+            break;
+        }
+        case 1:
+        {
+            // When timeout go to next state
+            if(g_failSafeChargeDelay != 0) break;
+            disableChargingSM = 2;
+            break;
+        }
+        case 2:
+        {
+            // Disable S2
+            disableChargingSM = 0;
+            break;
+        }
+    }
+}

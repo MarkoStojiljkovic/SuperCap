@@ -29,19 +29,21 @@
 #include "fram_driver.h"
 #include "framLayout.h"
 #include "bsp.h"
+#include "globals.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
-
+int g_DisableDischarger = 0;
+int g_DisableCharger = 0;
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
 
 // Cutoff values for ADC, if surpassed charger/discharger is immediately disabled 
-static signed int valueLowCH0 = 0;
-static signed int valueHighCH0 = 0x7FFF; // Max int16 value (positive)
-static signed int valueLowCH1 = 0;
-static signed int valueHighCH1 = 0x7FFF; // Max int16 value (positive)
+static signed int valueLowCH0 = INT16_MIN_VALUE;
+static signed int valueHighCH0 = INT16_MAX_VALUE; // Max int16 value (positive)
+static signed int valueLowCH1 = INT16_MIN_VALUE;
+static signed int valueHighCH1 = INT16_MAX_VALUE; // Max int16 value (positive)
 
 static uint16_t latency = 0;
 static uint16_t currentLatency = 0;
@@ -52,7 +54,6 @@ static uint8_t currentSampleChannel = 0;
 /*****************************************************************************
  Local Function Prototypes - Same order as defined
  *****************************************************************************/
-
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
@@ -124,7 +125,9 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
 
     if (ch == 0)
     {
-        // Current sample is from CH0
+        // CH0 is Current channel, no need for fail safe task
+        /*
+        // Sample is from CH0
         if ((lastSampledValue < valueLowCH0) || (lastSampledValue > valueHighCH0))
         {
             // Turn off charger
@@ -138,22 +141,27 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
             LED_RED = 0;
             #endif
         }
+         */
     }
     else
     {
-        // Current sample is from CH1
-        if ((lastSampledValue < valueLowCH1) || (lastSampledValue > valueHighCH1))
+        // Sample is from CH1, this occurs every 10ms 
+        if(lastSampledValue < valueLowCH1 && valueLowCH1 != INT16_MIN_VALUE)
         {
-            // Turn off charger
-            #if (CHARGER_CONTROLLER_DEBUG == 1)
-            LED_BLUE = 1;
-            #endif
+            g_DisableDischarger = 1;
         }
         else
         {
-            #if (CHARGER_CONTROLLER_DEBUG == 1)
-            LED_BLUE = 0;
-            #endif
+            g_DisableDischarger = 0;
+        }
+        
+        if(lastSampledValue > valueHighCH1 && valueHighCH1 != INT16_MIN_VALUE)
+        {
+            g_DisableCharger = 1;
+        }
+        else
+        {
+            g_DisableCharger = 0;
         }
     }
 }
