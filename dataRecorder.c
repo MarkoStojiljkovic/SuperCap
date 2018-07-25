@@ -88,9 +88,6 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel);
 static void DataRecorderDummy(int rawData, int channel);
 static void SwitchBufferPtr();
 static void InsertInBuffer(signed int data);
-//static void CalcSingleCh(signed int rawData); // OLD
-//static void CalcDualCh(signed int rawData); // OLD 
-static void InsertInBufferNEW(signed int rawData);
 
 /*****************************************************************************
  * Global Functions (Definitions)
@@ -209,7 +206,7 @@ void DataRecordFinish()
  *****************************************************************************/
 
 /* Call this from DataRecorderTask global function pointer T1 interrupt */
-static void DataRecorderContinuousTask(signed int rawData, int channel)
+static void DataRecorderContinuousTask(signed int offsetCorrectedData, int channel)
 {
     if (_enabled != 1) return;
     #if (DATA_REC_DEBUG_DIODES == 1)
@@ -257,7 +254,7 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
         else
         {
             _currentPrescalerVal = 0;
-            InsertInBufferNEW(rawData);
+            InsertInBuffer(offsetCorrectedData);
             #if (DATA_REC_DEBUG_DIODES == 1)
             if (DEBUG_DIODE == 1)
             {
@@ -273,7 +270,7 @@ static void DataRecorderContinuousTask(signed int rawData, int channel)
 }
 
 /* Call this from DataRecorderTask global function pointer in 1ms interval */
-static void DataRecorderTargetPointsTask(signed int rawData, int channel)
+static void DataRecorderTargetPointsTask(signed int offsetCorrectedData, int channel)
 {
     if (_enabled != 1) return;
 
@@ -320,7 +317,7 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel)
         else
         {
             _currentPrescalerVal = 0;
-            InsertInBufferNEW(rawData);
+            InsertInBuffer(offsetCorrectedData);
             #if (DATA_REC_DEBUG_DIODES == 1)
             if (DEBUG_DIODE == 1)
             {
@@ -336,7 +333,7 @@ static void DataRecorderTargetPointsTask(signed int rawData, int channel)
 
 }
 
-static void DataRecorderDummy(int rawData, int channel)
+static void DataRecorderDummy(int offsetCorrectedData, int channel)
 {
     return;
 }
@@ -374,11 +371,4 @@ static void InsertInBuffer(signed int data)
         dataBuffPtr[_currentDataBufferIndex++] = data;
     }
     _recordedPoints++;
-}
-
-static void InsertInBufferNEW(signed int rawData)
-{
-    // Offset correction
-    signed int offsetCorrectedValue = (signed int) rawData - SDOffset;
-    InsertInBuffer(offsetCorrectedValue);
 }

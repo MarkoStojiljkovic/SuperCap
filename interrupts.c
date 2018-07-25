@@ -88,7 +88,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
   if(g_failSafeChargeDelay != 0) g_failSafeChargeDelay--;
   if(g_failSafeDischargeDelay != 0) g_failSafeDischargeDelay--;
   
-  LastSyncAdcResult = SD1RESH;
+  LastSyncAdcResult = (signed int)SD1RESH - SDOffset;
   // ChargerControllTask(LastSyncAdcResult)
   StopwatchTick();
   

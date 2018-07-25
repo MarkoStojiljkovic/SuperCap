@@ -61,14 +61,10 @@ static uint8_t currentSampleChannel = 0;
 void ChargerControllerInit() // Call this function after ADC is initialized
 {
     FRAMReadArray(FRAM_CH0_LOW_LIMIT, &valueLowCH0, sizeof (valueLowCH0));
-    valueLowCH0 -= SDOffset; // Take offset into consideration
     FRAMReadArray(FRAM_CH0_HIGH_LIMIT, &valueHighCH0, sizeof (valueHighCH0));
-    valueHighCH0 -= SDOffset; // Take offset into consideration
 
     FRAMReadArray(FRAM_CH1_LOW_LIMIT, &valueLowCH1, sizeof (valueLowCH1));
-    valueLowCH1 -= SDOffset; // Take offset into consideration
     FRAMReadArray(FRAM_CH1_HIGH_LIMIT, &valueHighCH1, sizeof (valueHighCH1));
-    valueHighCH1 -= SDOffset; // Take offset into consideration
 
 }
 
@@ -84,14 +80,14 @@ void ChargerControllerSetCritLow(signed int newVal, uint8_t ch)
 {
     if (ch == 0)
     {
-        valueLowCH0 = newVal - SDOffset;
+        valueLowCH0 = newVal;
         // Update FRAM, this is allowed because this task is called from commander
         FRAMWriteArray(FRAM_CH0_LOW_LIMIT, &newVal, sizeof (newVal)); // Update offset uncorrected value
     }
     else
     {
         // For now every other value is CH1
-        valueLowCH1 = newVal - SDOffset;
+        valueLowCH1 = newVal;
         // Update FRAM, this is allowed because this task is called from commander
         FRAMWriteArray(FRAM_CH1_LOW_LIMIT, &newVal, sizeof (newVal)); // Update offset uncorrected value
     }
@@ -101,14 +97,14 @@ void ChargerControllerSetCritHigh(signed int newVal, uint8_t ch)
 {
     if (ch == 0)
     {
-        valueHighCH0 = newVal - SDOffset;
+        valueHighCH0 = newVal;
         // Update FRAM, this is allowed because this task is called from commander
         FRAMWriteArray(FRAM_CH0_HIGH_LIMIT, &newVal, sizeof (newVal)); // Update offset uncorrected value
     }
     else
     {
         // For now every other value is CH1
-        valueHighCH1 = newVal - SDOffset;
+        valueHighCH1 = newVal;
         // Update FRAM, this is allowed because this task is called from commander
         FRAMWriteArray(FRAM_CH1_HIGH_LIMIT, &newVal, sizeof (newVal)); // Update offset uncorrected value
     }
@@ -117,12 +113,11 @@ void ChargerControllerSetCritHigh(signed int newVal, uint8_t ch)
 /* Call this from interrupt */
 void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
 {
-    // Update current ADC state, new sample and which channel
+    // Update current ADC state, new sample and which channel for other tasks
     currentSampleChannel = ch;
     lastSampledValue = val;
 
     // Check fail safe conditions
-
     if (ch == 0)
     {
         // CH0 is Current channel, no need for fail safe task
