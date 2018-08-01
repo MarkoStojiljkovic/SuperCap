@@ -38,7 +38,7 @@
 #include "checksum.h"
 #include "delay.h"
 
-#define DEV_ADDRESS 0x31
+#define DEV_ADDRESS 52
 #define MESSAGE_INFO_LEN 2
 #define CHECKSUM_LEN 2
 #define MAX_STRING_LENGTH 80

@@ -164,29 +164,29 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
 int ChargerControllerRunToValueUp()
 {
     // First check is it selected channel
-    if (selectedChannel != currentSampleChannel) return 0;
-
-    // Channel is matched, now check values
-    if (lastSampledValue >= targetValue)
+    if (selectedChannel == currentSampleChannel)
     {
-        return 1;
+        // Channel is matched, now check values
+        if (lastSampledValue >= targetValue)
+        {
+            return 1;
+        }
     }
-    else
-        return 0;
+    return 0;
 }
 
 int ChargerControllerRunToValueDown()
 {
     // First check is it selected channel
-    if (selectedChannel != currentSampleChannel) return 0;
-
-    // Channel is matched, now check values
-    if (lastSampledValue <= targetValue)
+    if (selectedChannel == currentSampleChannel)
     {
-        return 1;
+        // Channel is matched, now check values
+        if (lastSampledValue <= targetValue)
+        {
+            return 1;
+        }
     }
-    else
-        return 0;
+    return 0;
 }
 
 void ChargerControllerSetTargetValue(signed int val)

@@ -108,8 +108,10 @@ static void instructionFanoxOff(void); //24
 static void instructionResOn(void); // 25
 static void instructionResOff(void); // 26
 static void instructionGetGain(void); //27
+static void instructionFastChargingOn(void); //28
+static void instructionFastChargingOff(void); // 29
 
-instructionPtr_t instructionPtr[28] = 
+instructionPtr_t instructionPtr[30] = 
 {
   instructionLedON,       //0
   instructionLedOFF,      //1
@@ -139,6 +141,8 @@ instructionPtr_t instructionPtr[28] =
   instructionResOn,                 //25
   instructionResOff,                //26
   instructionGetGain,               //27
+  instructionFastChargingOn,        //28
+  instructionFastChargingOff,       //29
 };
 /*****************************************************************************
  * Global Functions (Definitions)
@@ -484,8 +488,7 @@ static void instructionChargerOn() // 15
     SWITCH_10A_PIN = 0;
     SWITCH_100A_PIN =0;
     DISCH_EN_PIN = 1;  // complementary logic
-    SEL_MEASURE_100_10_PIN = 1; // maybe remove
-    REF_100_10_PIN = 1; // maybe remove
+    ODRZAVANJE = 1;
     CHARGER_EN_PIN = 1;
 }
 
@@ -499,7 +502,7 @@ static void instructionDischarger100AOn() // 17
 {
     currentInstruction++;
     CHARGER_EN_PIN = 0;
-    REF_100_10_PIN = 1;
+    REF_100_10_PIN = 0;
     SEL_MEASURE_100_10_PIN = 1;
     SWITCH_10A_PIN = 0;
     FANOX_EN_PIN = 0;
@@ -527,7 +530,7 @@ static void instructionDischarger10AOn() //20
 {
     currentInstruction++;
     CHARGER_EN_PIN = 0;
-    REF_100_10_PIN = 0;
+    REF_100_10_PIN = 1;
     SEL_MEASURE_100_10_PIN = 0;
     SWITCH_100A_PIN = 0;
     FANOX_EN_PIN = 0;
@@ -588,4 +591,16 @@ static void instructionGetGain() // 27
 {
     currentInstruction++;
     DataProviderFetchGain();
+}
+
+static void instructionFastChargingOn() //28
+{
+    currentInstruction++;
+    ODRZAVANJE = 1;
+}
+
+static void instructionFastChargingOff() //29
+{
+    currentInstruction++;
+    ODRZAVANJE = 0; // Miksa je imenovao pin
 }
