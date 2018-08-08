@@ -19,6 +19,7 @@
  * $HeadURL:  $
  *****************************************************************************/
 #define CHECKSUM_SIZE 2
+#define ACK_SIZE 3
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
@@ -83,6 +84,30 @@ void DataProviderFetchGain()
     // Append data to transmit buffer
     AppendDataToTransmitBuffer(dataLenBuff, sizeof(dataLenBuff));
     AppendDataToTransmitBuffer((uint8_t *)(&SDGain), sizeof(SDGain));
+    AppendDataToTransmitBuffer((uint8_t *)&res, sizeof(res));
+    busy = 0;
+}
+
+void DataProviderSendACK()
+{
+    const char ack[] = {'A', 'C', 'K'};
+    
+    if(busy == 1) return; // For now return if module is already sending data
+    busy = 1;
+    uint8_t dataLenBuff[2];
+    uint16_t totalLen = ACK_SIZE +  CHECKSUM_SIZE;
+    dataLenBuff[0] = (uint8_t)(totalLen); // LSB first
+    dataLenBuff[1] = (uint8_t)(totalLen >> 8);  //MSB after
+    
+    // Calculate checksum
+    ChecksumResetSendingMode();
+    ChecksumAppendSendingMode(dataLenBuff, sizeof(dataLenBuff));
+    ChecksumAppendSendingMode(&ack, ACK_SIZE);
+    uint16_t res = ChecksumGetSendingMode();
+    
+    // Append data to transmit buffer
+    AppendDataToTransmitBuffer(dataLenBuff, sizeof(dataLenBuff));
+    AppendDataToTransmitBuffer((uint8_t *)(&ack), ACK_SIZE);
     AppendDataToTransmitBuffer((uint8_t *)&res, sizeof(res));
     busy = 0;
 }

@@ -110,8 +110,9 @@ static void instructionResOff(void); // 26
 static void instructionGetGain(void); //27
 static void instructionFastChargingOn(void); //28
 static void instructionFastChargingOff(void); // 29
+static void instructionSendACK(void); // 30
 
-instructionPtr_t instructionPtr[30] = 
+instructionPtr_t instructionPtr[31] = 
 {
   instructionLedON,       //0
   instructionLedOFF,      //1
@@ -143,6 +144,7 @@ instructionPtr_t instructionPtr[30] =
   instructionGetGain,               //27
   instructionFastChargingOn,        //28
   instructionFastChargingOff,       //29
+  instructionSendACK,               //30
 };
 /*****************************************************************************
  * Global Functions (Definitions)
@@ -603,4 +605,10 @@ static void instructionFastChargingOff() //29
 {
     currentInstruction++;
     ODRZAVANJE = 0; // Miksa je imenovao pin
+}
+
+static void instructionSendACK() // 30
+{
+    currentInstruction++;
+    DataProviderSendACK();
 }

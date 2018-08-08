@@ -38,6 +38,7 @@
  *****************************************************************************/
 void DataProviderFetchData(uint32_t addr, uint16_t len);
 void DataProviderFetchGain();
+void DataProviderSendACK();
 void DataProviderTask();
 /*****************************************************************************
  * Declaration of Global Variables
