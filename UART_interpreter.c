@@ -77,7 +77,7 @@ static int CalculateMessageLength(char* buff);
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
-  
+
 // This function should be called from UART receive interrupt (when new byte arrived)
 void UART_Interpreter_Task(char c)
 {
@@ -196,7 +196,6 @@ void UART_Interpreter_Timeout()
   else
   {
     // Reset UART_Interpreter
-    
     // Reset receive buffer
     totalCharsRead = 0;
     
@@ -245,9 +244,11 @@ static bool EvaluateStart(char c)
 
 static int CalculateMessageLength(char* buff)
 {
-  int res = buff[0] << 8;
-  res |= buff[1];
-  return res;
+  uint16_t res = (uint16_t)buff[0];
+  unsigned char res2 = buff[1];
+  res = res << 8;
+  res |= res2;
+  return (int)res;
 }
 
 //static char tempFloatBuffer[20];

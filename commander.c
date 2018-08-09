@@ -19,7 +19,7 @@
  * $HeadURL:  $
  *****************************************************************************/
 
-#define INSTRUCTION_BUFFER_SIZE 100
+#define INSTRUCTION_BUFFER_SIZE 300
 
 enum commander_state
 {
