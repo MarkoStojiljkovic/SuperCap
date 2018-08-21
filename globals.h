@@ -23,17 +23,7 @@
 
 
 
-
-
-
-
-
-
 //RS485---------------------------------------------
-
-// TODO: REMOVE
-#define TASTON()          LATFbits.LATF3=1
-#define TASTOFF()         LATFbits.LATF3=0
 #define INT16_MAX_VALUE 32767
 #define INT16_MIN_VALUE -32768
 
@@ -43,6 +33,6 @@ extern int g_DisableCharger;
 extern int g_failSafeChargeDelay;
 extern int g_failSafeDischargeDelay;
 
-
+extern int g_chargerControllerDelayBetweenStages;
 #endif	/* GLOBALS_H */
 

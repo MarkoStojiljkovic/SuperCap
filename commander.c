@@ -23,17 +23,24 @@
 
 enum commander_state
 {
-  STATE_IDLE,
-  STATE_INIT,
-  STATE_ACTION,
-  STATE_WAIT,
-  STATE_ERROR
+    STATE_IDLE,
+    STATE_INIT,
+    STATE_ACTION,
+    STATE_WAIT,
+    STATE_ERROR
 };
+
 typedef enum
 {
-  STATE_WAIT_FOR_VALUE_INIT,
-  STATE_WAIT_FOR_VALUE_ACTIVE
+    STATE_WAIT_FOR_VALUE_INIT,
+    STATE_WAIT_FOR_VALUE_ACTIVE
 } charger_controller_SM_t;
+
+typedef enum
+{
+    INIT_NOT_READY,
+    INIT_READY
+} commander_init_status_t;
 
 /*****************************************************************************
  * Include Files
@@ -78,12 +85,13 @@ static uint16_t Get16bValue();
 static uint32_t Get32bValue();
 
 static void ResetCommander();
+static commander_init_status_t CommanderInit();
 
 // UART instructions
-static void instructionLedON (void); //0
-static void instructionLedOFF (void); //1
-static void instructionPinSet (void); //2
-static void instructionSetDelay(void);//3
+static void instructionLedON(void); //0
+static void instructionLedOFF(void); //1
+static void instructionPinSet(void); //2
+static void instructionSetDelay(void); //3
 static void instructionConfigDataRec(void); //4
 static void instructionDataRecFinish(void); //5
 static void instructionDataFetch(void); //6
@@ -111,106 +119,119 @@ static void instructionGetGain(void); //27
 static void instructionFastChargingOn(void); //28
 static void instructionFastChargingOff(void); // 29
 static void instructionSendACK(void); // 30
+static void instructionSetCutoff(void); // 31
 
-instructionPtr_t instructionPtr[31] = 
-{
-  instructionLedON,       //0
-  instructionLedOFF,      //1
-  instructionPinSet,      //2
-  instructionSetDelay,    //3
-  instructionConfigDataRec, //4
-  instructionDataRecFinish,   //5
-  instructionDataFetch,   //6
-  instructionEraseMeasurements,   //7
-  instructionWaitForDataRecorderToFinish,  //8
-  instructionWaitForValueRising, // 9
-  instructionWaitForValueFalling, // 10
-  instructionSetCriticalLow,        //11
-  instructionSetCriticalHigh,       //12
-  instructionPinSetHigh,            //13
-  instructionPinSetLow,             //14
-  instructionChargerOn,             //15
-  instructionChargerOff,            //16
-  instructionDischarger100AOn,      //17
-  instructionDischarger100AOffS1,   //18
-  instructionDischarger100AOffS2,   //19
-  instructionDischarger10AOn,       //20
-  instructionDischarger10AOffS1,    //21
-  instructionDischarger10AOffS2,    //22
-  instructionFanoxOn,               //23
-  instructionFanoxOff,              //24
-  instructionResOn,                 //25
-  instructionResOff,                //26
-  instructionGetGain,               //27
-  instructionFastChargingOn,        //28
-  instructionFastChargingOff,       //29
-  instructionSendACK,               //30
+instructionPtr_t instructionPtr[32] ={
+    instructionLedON, //0
+    instructionLedOFF, //1
+    instructionPinSet, //2
+    instructionSetDelay, //3
+    instructionConfigDataRec, //4
+    instructionDataRecFinish, //5
+    instructionDataFetch, //6
+    instructionEraseMeasurements, //7
+    instructionWaitForDataRecorderToFinish, //8
+    instructionWaitForValueRising, // 9
+    instructionWaitForValueFalling, // 10
+    instructionSetCriticalLow, //11
+    instructionSetCriticalHigh, //12
+    instructionPinSetHigh, //13
+    instructionPinSetLow, //14
+    instructionChargerOn, //15
+    instructionChargerOff, //16
+    instructionDischarger100AOn, //17
+    instructionDischarger100AOffS1, //18
+    instructionDischarger100AOffS2, //19
+    instructionDischarger10AOn, //20
+    instructionDischarger10AOffS1, //21
+    instructionDischarger10AOffS2, //22
+    instructionFanoxOn, //23
+    instructionFanoxOff, //24
+    instructionResOn, //25
+    instructionResOff, //26
+    instructionGetGain, //27
+    instructionFastChargingOn, //28
+    instructionFastChargingOff, //29
+    instructionSendACK, //30
+    instructionSetCutoff, //31
 };
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
 
 static enum commander_state state = STATE_IDLE;
+
 void CommanderTask(void)
 {
-  switch (state)
-  {
-    case STATE_IDLE:
+    switch (state)
     {
-      if(startFlag != 0) state = STATE_INIT;
-      break;
+        case STATE_IDLE:
+        {
+            if (startFlag != 0) state = STATE_INIT;
+            break;
+        }
+
+        case STATE_INIT:
+        { // Initial state 
+            if (CommanderInit() == INIT_READY)
+            {
+                state = STATE_ACTION;
+            }
+            break;
+        }
+        case STATE_ACTION:
+        {
+            if (!DelayCommander()) break; // Skip action if delay is activated
+            // Implement wait for function
+            if (currentInstruction >= totalInstructions)
+            {
+                // All instructions executed go back in idle
+                state = STATE_IDLE;
+                break;
+            }
+            uint8_t op = instructionArray[currentInstruction]; // Get instruction pointed by PC (program counter)
+            // Implement failsafe mechanism
+            instructionPtr[op](); //executeSMInstruction
+            break;
+        }
+        case STATE_ERROR:
+        {
+            break; // Just return for now
+        }
+        default: break;
     }
-    
-    case STATE_INIT:
-    { // Initial state 
-      currentInstruction = 0;
-      startFlag = 0;
-      state = STATE_ACTION;
-      break;
-    }
-    case STATE_ACTION: 
-    {
-      if(!DelayCommander()) break; // Skip action if delay is activated
-      // Implement wait for function
-      if(currentInstruction >= totalInstructions)
-      {
-        // All instructions executed go back in idle
-        state = STATE_IDLE;
-        break;
-      }
-      uint8_t op = instructionArray[currentInstruction]; // Get instruction pointed by PC (program counter)
-      // Implement failsafe mechanism
-      instructionPtr[op](); //executeSMInstruction
-      break;
-    }
-    case STATE_ERROR:
-    {
-      break; // Just return for now
-    }
-    default : break;
-  }
-  return;
+    return;
 } // End RuleEngineSM
 
-
-
+// Set everything for commander that needs to be set before start
+static commander_init_status_t CommanderInit()
+{
+    
+    currentInstruction = 0;
+    startFlag = 0;
+    if(ChargerControllerDisableAllActions() == RESPONSE_READY)
+    {
+        return INIT_READY;
+    }
+    return INIT_NOT_READY;
+}
 
 void FillInstructionArray(uint8_t* buff, int len)
 {
-  ResetCommander(); // this should be done prior to filling
-  if(len > INSTRUCTION_BUFFER_SIZE) return;
-  
-  int i;
-  for(i=0; i <len; i++)
-  {
-    instructionArray[i] = buff[i];
-  }
-  totalInstructions = len;
+    ResetCommander(); // this should be done prior to filling
+    if (len > INSTRUCTION_BUFFER_SIZE) return;
+
+    int i;
+    for (i = 0; i < len; i++)
+    {
+        instructionArray[i] = buff[i];
+    }
+    totalInstructions = len;
 }
 
 void DelayTick()
 {
-  if(delayCounter != 0) delayCounter--;
+    if (delayCounter != 0) delayCounter--;
 }
 
 /*****************************************************************************
@@ -218,218 +239,214 @@ void DelayTick()
  *****************************************************************************/
 static bool DelayCommander()
 {
-  if(delayCounter != 0) return false;
-  
-  // Its 0, timeout has passed
-  return true;
+    if (delayCounter != 0) return false;
+
+    // Its 0, timeout has passed
+    return true;
 }
 
 static uint8_t Get8bValue()
 {
-  return instructionArray[currentInstruction++];
+    return instructionArray[currentInstruction++];
 }
 
 static uint16_t Get16bValue()
 {
-  uint16_t temp = ((uint16_t)instructionArray[currentInstruction++]) << 8;
-  temp |= (uint16_t)instructionArray[currentInstruction++];
-  return temp;
+    uint16_t temp = ((uint16_t) instructionArray[currentInstruction++]) << 8;
+    temp |= (uint16_t) instructionArray[currentInstruction++];
+    return temp;
 }
 
 static uint32_t Get32bValue()
 {
-  uint16_t temp = Get16bValue();
-  uint32_t temp32 = (uint32_t)temp << 16;
-  temp32 |= (uint32_t)Get16bValue();
-  return temp32;
+    uint16_t temp = Get16bValue();
+    uint32_t temp32 = (uint32_t) temp << 16;
+    temp32 |= (uint32_t) Get16bValue();
+    return temp32;
 }
 
 static void ResetCommander()
 {
-  delayCounter = 0;
-  currentInstruction = 0;
-  totalInstructions = 0;
-  startFlag = 0;
-  chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT; // Reset charger controller internal state
-  state = STATE_IDLE;
+    delayCounter = 0;
+    currentInstruction = 0;
+    totalInstructions = 0;
+    startFlag = 0;
+    chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT; // Reset charger controller internal state
+    state = STATE_IDLE;
 }
 
-
-
-
-static void instructionLedON (void)//0
+static void instructionLedON(void)//0
 {
-  currentInstruction++; // point to next location which hold LED ID
-  uint8_t ledNum = instructionArray[currentInstruction];
-  switch(ledNum)
-  {
-    case 1:
+    currentInstruction++; // point to next location which hold LED ID
+    uint8_t ledNum = instructionArray[currentInstruction];
+    switch (ledNum)
     {
-      LED_RED = 1;
-      break;
+        case 1:
+        {
+            LED_RED = 1;
+            break;
+        }
+        case 2:
+        {
+            LED_GREEN = 1;
+            break;
+        }
+        case 3:
+        {
+            LED_YELLOW = 1;
+            break;
+        }
+        default: break;
     }
-    case 2:
-    {
-      LED_GREEN = 1;
-      break;
-    }
-    case 3:
-    {
-      LED_YELLOW = 1;
-      break;
-    }
-    default: break;
-  }
-  currentInstruction++;
+    currentInstruction++;
 }
 
-static void instructionLedOFF (void) //1
+static void instructionLedOFF(void) //1
 {
-  currentInstruction++; // point to next location which hold LED ID
-  uint8_t ledNum = instructionArray[currentInstruction];
-  switch(ledNum)
-  {
-    case 1:
+    currentInstruction++; // point to next location which hold LED ID
+    uint8_t ledNum = instructionArray[currentInstruction];
+    switch (ledNum)
     {
-      LED_RED = 0;
-      break;
+        case 1:
+        {
+            LED_RED = 0;
+            break;
+        }
+        case 2:
+        {
+            LED_GREEN = 0;
+            break;
+        }
+        case 3:
+        {
+            LED_YELLOW = 0;
+            break;
+        }
+        default: break;
     }
-    case 2:
-    {
-      LED_GREEN = 0;
-      break;
-    }
-    case 3:
-    {
-      LED_YELLOW = 0;
-      break;
-    }
-    default: break;
-  }
-  currentInstruction++;
+    currentInstruction++;
 }
 
-static void instructionPinSet (void) //2    Sets P6 pin, DEBUG FUNCTION, IGNORE
+static void instructionPinSet(void) //2    Sets P6 pin, DEBUG FUNCTION, IGNORE
 {
-  currentInstruction++; // point to next loc
-  TP6_PIN = 1;
+    currentInstruction++; // point to next loc
+    TP6_PIN = 1;
 }
 
-static void instructionSetDelay (void) //3   Set delay to the commander, loc1 & loc2 & loc3 & loc4 forms 32bit mseconds value
+static void instructionSetDelay(void) //3   Set delay to the commander, loc1 & loc2 & loc3 & loc4 forms 32bit mseconds value
 {
-  currentInstruction++; // point to next loc
-  uint16_t temp = Get16bValue();
-  delayCounter = (uint32_t)temp << 16;
-  delayCounter |= (uint32_t)Get16bValue();
+    currentInstruction++; // point to next loc
+    uint16_t temp = Get16bValue();
+    delayCounter = (uint32_t) temp << 16;
+    delayCounter |= (uint32_t) Get16bValue();
 }
 
 static void instructionConfigDataRec(void) //4
 {
-  currentInstruction++; // point to next loc
-  uint8_t chMode = Get8bValue();
-  uint8_t opMode = Get8bValue();
-  uint32_t presc = Get32bValue();
-  uint32_t targetPts = Get32bValue();
-  uint8_t time[6];
-  int i;
-  for(i = 0; i < 6; i++)
-  {
-      time[i] = Get8bValue();
-  }
-  
-  DataRecorderConfigAndRun(chMode, opMode, presc, targetPts, time);
+    currentInstruction++; // point to next loc
+    uint8_t chMode = Get8bValue();
+    uint8_t opMode = Get8bValue();
+    uint32_t presc = Get32bValue();
+    uint32_t targetPts = Get32bValue();
+    uint8_t time[6];
+    int i;
+    for (i = 0; i < 6; i++)
+    {
+        time[i] = Get8bValue();
+    }
+
+    DataRecorderConfigAndRun(chMode, opMode, presc, targetPts, time);
 }
 
 static void instructionDataRecFinish(void) //5
 {
-  currentInstruction++; // point to next loc
-  DataRecordFinish();
+    currentInstruction++; // point to next loc
+    DataRecordFinish();
 }
 
 static void instructionDataFetch(void) //6
 {
-  currentInstruction++; // point to next loc
-  uint32_t addr = Get32bValue();
-  uint16_t len = Get16bValue();
-  DataProviderFetchData(addr, len);
+    currentInstruction++; // point to next loc
+    uint32_t addr = Get32bValue();
+    uint16_t len = Get16bValue();
+    DataProviderFetchData(addr, len);
 }
 
 static void instructionEraseMeasurements(void) //7
 {
-  currentInstruction++; // point to next loc
-  EraseMeasurements();
+    currentInstruction++; // point to next loc
+    EraseMeasurements();
 }
 
 static void instructionWaitForDataRecorderToFinish(void) //8
 {
-  // Keep this instruction executed until dataRecorder ready flag is set
-  if(dataRecorderReady != 1) return;
-  currentInstruction++; // dataRecorder finished its task, point to next location/instruction
+    // Keep this instruction executed until dataRecorder ready flag is set
+    if (dataRecorderReady != 1) return;
+    currentInstruction++; // dataRecorder finished its task, point to next location/instruction
 }
-
 
 static void instructionWaitForValueRising(void) // 9
 {
-  switch(chargerControllerInstructionState)
-  {
-    case STATE_WAIT_FOR_VALUE_INIT:
+    switch (chargerControllerInstructionState)
     {
-      currentInstruction++;
-      ChargerControllerSetChannel(Get8bValue());
-      ChargerControllerSetLatency(Get16bValue());
-      ChargerControllerSetTargetValue(Get16bValue());
-      chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_ACTIVE;
-      currentInstruction -= 6; // Repeat this instruction until value is reached
-      // Go to next state immediately
+        case STATE_WAIT_FOR_VALUE_INIT:
+        {
+            currentInstruction++;
+            ChargerControllerSetChannel(Get8bValue());
+            ChargerControllerSetLatency(Get16bValue());
+            ChargerControllerSetTargetValue(Get16bValue());
+            chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_ACTIVE;
+            currentInstruction -= 6; // Repeat this instruction until value is reached
+            // Go to next state immediately
+        }
+        case STATE_WAIT_FOR_VALUE_ACTIVE:
+        {
+            if (ChargerControllerRunToValueUp())
+            {
+                chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
+                currentInstruction += 6; // point to location after this instruction
+            }
+            break;
+        }
+        default:
+        {
+            // This shouldn't happen, just go to next instruction
+            currentInstruction += 6; // point to next loc
+            chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
+        }
     }
-    case STATE_WAIT_FOR_VALUE_ACTIVE:
-    {
-      if(ChargerControllerRunToValueUp())
-      {
-        chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
-        currentInstruction += 6; // point to location after this instruction
-      }
-      break;
-    }
-    default:
-    {
-      // This shouldn't happen, just go to next instruction
-      currentInstruction += 6; // point to next loc
-      chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
-    }
-  }
 }
 
 static void instructionWaitForValueFalling(void) // 10
 {
-  switch(chargerControllerInstructionState)
-  {
-    case STATE_WAIT_FOR_VALUE_INIT:
+    switch (chargerControllerInstructionState)
     {
-      currentInstruction++;
-      ChargerControllerSetChannel(Get8bValue());
-      ChargerControllerSetLatency(Get16bValue());
-      ChargerControllerSetTargetValue(Get16bValue());
-      chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_ACTIVE;
-      currentInstruction -= 6; // Repeat this instruction until value is reached
-      // Go to next state immediately
+        case STATE_WAIT_FOR_VALUE_INIT:
+        {
+            currentInstruction++;
+            ChargerControllerSetChannel(Get8bValue());
+            ChargerControllerSetLatency(Get16bValue());
+            ChargerControllerSetTargetValue(Get16bValue());
+            chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_ACTIVE;
+            currentInstruction -= 6; // Repeat this instruction until value is reached
+            // Go to next state immediately
+        }
+        case STATE_WAIT_FOR_VALUE_ACTIVE:
+        {
+            if (ChargerControllerRunToValueDown())
+            {
+                chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
+                currentInstruction += 6; // point to location after this instruction
+            }
+            break;
+        }
+        default:
+        {
+            // This shouldn't happen, just go to next instruction
+            currentInstruction += 6; // point to next loc
+            chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
+        }
     }
-    case STATE_WAIT_FOR_VALUE_ACTIVE:
-    {
-      if(ChargerControllerRunToValueDown())
-      {
-        chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
-        currentInstruction += 6; // point to location after this instruction
-      }
-      break;
-    }
-    default:
-    {
-      // This shouldn't happen, just go to next instruction
-      currentInstruction += 6; // point to next loc
-      chargerControllerInstructionState = STATE_WAIT_FOR_VALUE_INIT;
-    }
-  }
 }
 
 static void instructionSetCriticalLow() // 11
@@ -450,36 +467,52 @@ static void instructionPinSetHigh() //13
 {
     currentInstruction++;
     uint8_t pinId = Get8bValue();
-    switch(pinId)
+    switch (pinId)
     {
-        case 51: RES_EN_PIN = 1; break;
-        case 52: FANOX_EN_PIN = 1; break;
-        case 53: SEL_MEASURE_100_10_PIN = 1; break;
-        case 55: CHARGER_EN_PIN = 1; break;
-        case 60: REF_100_10_PIN = 1; break;
-        case 61: SWITCH_10A_PIN = 1; break;
-        case 62: SWITCH_100A_PIN = 1; break;
-        case 63: DISCH_EN_PIN = 1; break;
+        case 51: RES_EN_PIN = 1;
+            break;
+        case 52: FANOX_EN_PIN = 1;
+            break;
+        case 53: SEL_MEASURE_100_10_PIN = 1;
+            break;
+        case 55: CHARGER_EN_PIN = 1;
+            break;
+        case 60: REF_100_10_PIN = 1;
+            break;
+        case 61: SWITCH_10A_PIN = 1;
+            break;
+        case 62: SWITCH_100A_PIN = 1;
+            break;
+        case 63: DISCH_EN_PIN = 1;
+            break;
         default: break;
-    }   
+    }
 }
 
 static void instructionPinSetLow() //14
 {
     currentInstruction++;
     uint8_t pinId = Get8bValue();
-    switch(pinId)
+    switch (pinId)
     {
-        case 51: RES_EN_PIN = 0; break;
-        case 52: FANOX_EN_PIN = 0; break;
-        case 53: SEL_MEASURE_100_10_PIN = 0; break;
-        case 55: CHARGER_EN_PIN = 0; break;
-        case 60: REF_100_10_PIN = 0; break;
-        case 61: SWITCH_10A_PIN = 0; break;
-        case 62: SWITCH_100A_PIN = 0; break;
-        case 63: DISCH_EN_PIN = 0; break;
+        case 51: RES_EN_PIN = 0;
+            break;
+        case 52: FANOX_EN_PIN = 0;
+            break;
+        case 53: SEL_MEASURE_100_10_PIN = 0;
+            break;
+        case 55: CHARGER_EN_PIN = 0;
+            break;
+        case 60: REF_100_10_PIN = 0;
+            break;
+        case 61: SWITCH_10A_PIN = 0;
+            break;
+        case 62: SWITCH_100A_PIN = 0;
+            break;
+        case 63: DISCH_EN_PIN = 0;
+            break;
         default: break;
-    }   
+    }
 }
 
 static void instructionChargerOn() // 15
@@ -488,8 +521,8 @@ static void instructionChargerOn() // 15
     FANOX_EN_PIN = 0;
     RES_EN_PIN = 0;
     SWITCH_10A_PIN = 0;
-    SWITCH_100A_PIN =0;
-    DISCH_EN_PIN = 1;  // complementary logic
+    SWITCH_100A_PIN = 0;
+    DISCH_EN_PIN = 1; // complementary logic
     ODRZAVANJE = 1;
     CHARGER_EN_PIN = 1;
 }
@@ -514,6 +547,7 @@ static void instructionDischarger100AOn() // 17
 }
 
 // Turning off discharger is composed of 2 stages which should be apart by some time (1s), this is first
+
 static void instructionDischarger100AOffS1() //18
 {
     currentInstruction++;
@@ -521,12 +555,12 @@ static void instructionDischarger100AOffS1() //18
 }
 
 // Stage 2 discharger off instruction
+
 static void instructionDischarger100AOffS2() // 19
 {
     currentInstruction++;
     DISCH_EN_PIN = 1;
 }
-
 
 static void instructionDischarger10AOn() //20
 {
@@ -542,6 +576,7 @@ static void instructionDischarger10AOn() //20
 }
 
 // Turning off discharger is composed of 2 stages which should be apart by some time (1s), this is first
+
 static void instructionDischarger10AOffS1() // 21
 {
     currentInstruction++;
@@ -549,6 +584,7 @@ static void instructionDischarger10AOffS1() // 21
 }
 
 // Stage 2 discharger off instruction
+
 static void instructionDischarger10AOffS2() // 22
 {
     currentInstruction++;
@@ -611,4 +647,11 @@ static void instructionSendACK() // 30
 {
     currentInstruction++;
     DataProviderSendACK();
+}
+
+static void instructionSetCutoff() // 31
+{
+    currentInstruction++;
+    uint16_t temp = Get16bValue();
+    ChargerControllerSetCutoffValue(temp);
 }

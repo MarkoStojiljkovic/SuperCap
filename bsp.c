@@ -2,7 +2,7 @@
  * Copyright 2018 Netico
  *****************************************************************************
  *
- * Filename    : chargerController.h
+ * Filename    : bsp.c
  *
  * Created By  : Marko
  *
@@ -14,54 +14,72 @@
  *
  *****************************************************************************
  * $LastChangedDate:  $
- * $LastChangedRevision: $
- * $LastChangedBy: $
+ * $LastChangedRevision:  $
+ * $LastChangedBy:  $
  * $HeadURL:  $
  *****************************************************************************/
-
-#ifndef _CHARGER_CONTROLLER_h
-#define _CHARGER_CONTROLLER_h
 
 /*****************************************************************************
  * Include Files
  *****************************************************************************/
-#include <stdint.h>
-
-/*****************************************************************************
- * Project Specific Types
- *****************************************************************************/
-typedef enum
-{
-    RESPONSE_NOT_READY,
-    RESPONSE_READY,
-    RESPONSE_ERROR
-} SHUTDOWN_RESPONSE_t;
-
-/*****************************************************************************
- * Global Function Prototypes
- *****************************************************************************/
-void ChargerControllerInit();
-void ChargerControllerSetLatency(uint16_t lat);
-void ChargerControllerSetCritLow(signed int newVal, uint8_t ch);
-void ChargerControllerSetCritHigh(signed int newVal, uint8_t ch);
-void ChargerControllerSetCutoffValue(signed int newVal);
-void ChargerControllerFailSafeTask(signed int val, uint8_t ch);
-int ChargerControllerRunToValueUp();
-int ChargerControllerRunToValueDown();
-void ChargerControllerSetTargetValue(signed int val);
-void ChargerControllerSetChannel(uint8_t channel);
-SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions();
+#include "bsp.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
 
 /*****************************************************************************
- * Macros
+ Declaration of File Scope Variables
  *****************************************************************************/
 
 /*****************************************************************************
- * Constants
+ Local Function Prototypes - Same order as defined
  *****************************************************************************/
 
-#endif
-
+/*****************************************************************************
+ * Global Functions (Definitions)
+ *****************************************************************************/
+void Toggle_LED(int num)
+{
+    switch(num)
+    {
+        case 1:
+        {
+            if(LED_RED == 1)
+            {
+                LED_RED = 0;
+            }
+            else
+            {
+                LED_RED = 1;
+            }
+            break;
+        }
+        case 2:
+        {
+            if(LED_GREEN == 1)
+            {
+                LED_GREEN = 0;
+            }
+            else
+            {
+                LED_GREEN = 1;
+            }
+            break;
+        }
+        case 3:
+        {
+            if(LED_YELLOW == 1)
+            {
+                LED_YELLOW = 0;
+            }
+            else
+            {
+                LED_YELLOW = 1;
+            }
+            break;
+        }
+    }
+}
+/*****************************************************************************
+ * Local Functions (Definitions)
+ *****************************************************************************/
