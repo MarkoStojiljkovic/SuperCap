@@ -171,23 +171,27 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
         }
         
         // Cutoff failsafe
-        if(cutoffValueCH1 != INT16_MIN_VALUE && lastSampledValue < cutoffValueCH1)
+        if(cutoffValueCH1 != INT16_MIN_VALUE)
         {
-            if(cutoffLatency >= CRITICAL_LATENCY)
+            if(lastSampledValue < cutoffValueCH1)
             {
-                // Request shutdown for both modules
-                g_DisableCharger = 1;
-                g_DisableDischarger = 1;
+                if(cutoffLatency >= CRITICAL_LATENCY)
+                {
+                    // Request shutdown for both modules
+                    g_DisableCharger = 1;
+                    g_DisableDischarger = 1;
+                }
+                else
+                    cutoffLatency++;
             }
             else
-                cutoffLatency++;
+            {
+//                g_DisableCharger = 0;
+//                g_DisableDischarger = 0;
+                cutoffLatency = 0;
+            }
         }
-        else
-        {
-            g_DisableCharger = 0;
-            g_DisableDischarger = 0;
-            cutoffLatency = 0;
-        }
+        
     }
 }
 
