@@ -48,6 +48,8 @@ typedef enum
  * Declaration of Global Variables
  *****************************************************************************/
 static signed int LastSyncAdcResult = 0;
+signed int g_LastADCResultCH0 = 0;
+signed int g_LastADCResultCH1 = 0;
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
@@ -121,6 +123,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
     }
     case STATE_CH0:
     {
+      g_LastADCResultCH0 = LastSyncAdcResult;
       DataRecorderTask(LastSyncAdcResult, CHANNEL0);
       ChargerControllerFailSafeTask(LastSyncAdcResult, CHANNEL0);
       calcuState = STATE_CH_DELAY;
@@ -131,6 +134,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void)//interup
     }
     case STATE_CH1:
     {
+      g_LastADCResultCH1 = LastSyncAdcResult;
       DataRecorderTask(LastSyncAdcResult, CHANNEL1);
       ChargerControllerFailSafeTask(LastSyncAdcResult, CHANNEL1);
       calcuState = STATE_CH_DELAY;

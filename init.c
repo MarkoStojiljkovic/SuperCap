@@ -33,6 +33,7 @@
 #include "dataRecorder.h"
 #include "FRAM_Controller.h"
 #include "chargerController.h"
+#include "UART_interpreter.h"
 
 //TODO: Maybe move all priority selection in same file (ADC is not here)
 #define CPU_PRIO    0
@@ -72,7 +73,7 @@ _CONFIG2(POSCMD_HS & OSCIOFCN_OFF & FNOSC_PRI & IESO_OFF)
  Local Function Prototypes - Same order as defined
  *****************************************************************************/
 static void UartInit();
-
+static void InitDeviceAddress();
 /*****************************************************************************
  * Global Functions (Definitions)
  *****************************************************************************/
@@ -144,14 +145,14 @@ void Init()
     TRISDbits.TRISD8 = OUTPUT; // ODRZAVANJE
 
     // DEV ID PINS
-    TRISDbits.TRISD0;       // pin 46
-    TRISDbits.TRISD2;       // pin 50
-    TRISDbits.TRISD3;       // pin 51
-    TRISDbits.TRISD4;       // pin 52
-    TRISDbits.TRISD5;       // pin 53
-    TRISDbits.TRISD6;       // pin 54
-    TRISDbits.TRISD7;       // pin 55
-    TRISEbits.TRISE0;       // pin 60
+    TRISDbits.TRISD0 = INPUT;       // pin 46
+    TRISDbits.TRISD2 = INPUT;       // pin 50
+    TRISDbits.TRISD3 = INPUT;       // pin 51
+    TRISDbits.TRISD4 = INPUT;       // pin 52
+    TRISDbits.TRISD5 = INPUT;       // pin 53
+    TRISDbits.TRISD6 = INPUT;       // pin 54
+    TRISDbits.TRISD7 = INPUT;       // pin 55
+    TRISEbits.TRISE0 = INPUT;       // pin 60
 
             // End port init -----------------------------------
     ANSB = 0b0000000000000000; //B0,B1 nisu analogni ulazi
@@ -170,6 +171,8 @@ void Init()
     FRAMControllerInit();
     ChargerControllerInit();
 
+    InitDeviceAddress();
+    
 }
 
 /*****************************************************************************
@@ -214,4 +217,19 @@ static void UartInit()
 
     Delay1ms(100);
     IEC0bits.U1RXIE = 1; //interrupt enable
+}
+
+static void InitDeviceAddress()
+{
+    unsigned char adr;
+    
+    adr = ADDR0;
+    adr |= ADDR1 << 1;
+    adr |= ADDR2 << 2;
+    adr |= ADDR3 << 3;
+    adr |= ADDR4 << 4;
+    adr |= ADDR5 << 5;
+    adr |= ADDR6 << 6;
+    adr |= ADDR7 << 7;
+    g_dev_address = adr;
 }

@@ -37,7 +37,7 @@
  * Global Function Prototypes
  *****************************************************************************/
 void DataProviderFetchData(uint32_t addr, uint16_t len);
-void DataProviderFetchGain();
+void DataProviderFetchSample(uint8_t ch);
 void DataProviderSendACK();
 void DataProviderTask();
 /*****************************************************************************

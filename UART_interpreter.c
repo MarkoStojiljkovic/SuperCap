@@ -38,17 +38,16 @@
 #include "checksum.h"
 #include "delay.h"
 
-#define DEV_ADDRESS 50
+#define DEV_ADDRESS 52
 #define MESSAGE_INFO_LEN 2
 #define CHECKSUM_LEN 2
-#define MAX_STRING_LENGTH 80
 #define START_SEQ 0xfe
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #define DEBUG_DIODE LED_YELLOW
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
-
+unsigned char g_dev_address = 0;
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
@@ -143,7 +142,7 @@ void UART_Interpreter_Task(char c)
         
         ChecksumAppendReceiveMode(receiveBuffer, totalCharsRead - 2); // Exclude checksum from calculation
         ChecksumAppenByteReceiveMode(START_SEQ);
-        ChecksumAppenByteReceiveMode(DEV_ADDRESS);
+        ChecksumAppenByteReceiveMode(g_dev_address);
         
         if(ChecksumCompareReceiveMode(receiveBuffer, totalCharsRead - 2))
         {
@@ -226,7 +225,9 @@ void UART_Interpreter_Timeout()
 
 static bool CompareAddress(char c)
 {
-  return (c == (char)DEV_ADDRESS);
+    if(g_dev_address == 0) return false; // Address 0 is not valid address
+    
+    return (c == (char)g_dev_address);
 }
 
 static void ExecuteAction()

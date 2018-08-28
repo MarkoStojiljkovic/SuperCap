@@ -54,14 +54,14 @@
 
 
 // DEV ID PINS
-#define ADDR0                   LATDbits.LATD0 // pin 46
-#define ADDR1                   LATDbits.LATD2 // pin 50
-#define ADDR2                   LATDbits.LATD3 // pin 51
-#define ADDR3                   LATDbits.LATD4 // pin 52
-#define ADDR4                   LATDbits.LATD5 // pin 53
-#define ADDR5                   LATDbits.LATD6 // pin 54
-#define ADDR6                   LATDbits.LATD7 // pin 55
-#define ADDR7                   LATEbits.LATE0 // pin 60
+#define ADDR0                   PORTDbits.RD0 // pin 46
+#define ADDR1                   PORTDbits.RD2 // pin 50
+#define ADDR2                   PORTDbits.RD3 // pin 51
+#define ADDR3                   PORTDbits.RD4 // pin 52
+#define ADDR4                   PORTDbits.RD5 // pin 53
+#define ADDR5                   PORTDbits.RD6 // pin 54
+#define ADDR6                   PORTDbits.RD7 // pin 55
+#define ADDR7                   PORTEbits.RE0 // pin 60
 
 // UART
 #define RS485_DIR               LATFbits.LATF3 // pin 33

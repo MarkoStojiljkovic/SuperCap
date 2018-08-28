@@ -19,8 +19,6 @@
  * $HeadURL:  $
  *****************************************************************************/
 
-#define INSTRUCTION_BUFFER_SIZE 300
-
 enum commander_state
 {
     STATE_IDLE,
@@ -53,6 +51,13 @@ typedef enum
 #include "dataProvider.h"
 #include "FRAM_Controller.h"
 #include "chargerController.h"
+
+
+#define INSTRUCTION_BUFFER_SIZE 300
+#define USE_COMMANDER_ACTIVE_LED 1
+#define COMMANDER_LED LED_YELLOW
+
+
 
 typedef void (*instructionPtr_t)(void); // Typedef for instruction pointers
 
@@ -115,7 +120,7 @@ static void instructionFanoxOn(void); // 23
 static void instructionFanoxOff(void); //24
 static void instructionResOn(void); // 25
 static void instructionResOff(void); // 26
-static void instructionGetGain(void); //27
+static void instructionGetLastSample(void); //27
 static void instructionFastChargingOn(void); //28
 static void instructionFastChargingOff(void); // 29
 static void instructionSendACK(void); // 30
@@ -149,7 +154,7 @@ instructionPtr_t instructionPtr[32] ={
     instructionFanoxOff, //24
     instructionResOn, //25
     instructionResOff, //26
-    instructionGetGain, //27
+    instructionGetLastSample, //27
     instructionFastChargingOn, //28
     instructionFastChargingOff, //29
     instructionSendACK, //30
@@ -181,12 +186,18 @@ void CommanderTask(void)
         }
         case STATE_ACTION:
         {
+            #if USE_COMMANDER_ACTIVE_LED
+                COMMANDER_LED = 1;
+            #endif
             if (!DelayCommander()) break; // Skip action if delay is activated
             // Implement wait for function
             if (currentInstruction >= totalInstructions)
             {
                 // All instructions executed go back in idle
                 state = STATE_IDLE;
+            #if USE_COMMANDER_ACTIVE_LED
+                COMMANDER_LED = 0;
+            #endif
                 break;
             }
             uint8_t op = instructionArray[currentInstruction]; // Get instruction pointed by PC (program counter)
@@ -625,10 +636,11 @@ static void instructionResOff() // 26
     RES_EN_PIN = 0;
 }
 
-static void instructionGetGain() // 27
+static void instructionGetLastSample() // 27
 {
     currentInstruction++;
-    DataProviderFetchGain();
+    uint8_t ch = Get8bValue();
+    DataProviderFetchSample(ch);
 }
 
 static void instructionFastChargingOn() //28

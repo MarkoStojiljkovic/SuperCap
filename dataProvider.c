@@ -28,6 +28,7 @@
 #include "UARTBuffer.h"
 #include "checksum.h"
 #include "sigmaDeltaADC.h"
+#include "interrupts.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
@@ -66,24 +67,32 @@ void DataProviderFetchData(uint32_t addr, uint16_t len)
 }
 
 // Return gain, this function is not checking if transmit buffer is free, this could cause errors on client side but it is very unlikely
-void DataProviderFetchGain()
+void DataProviderFetchSample(uint8_t ch)
 {
     if(busy == 1) return; // For now return if module is already sending data
     busy = 1;
     uint8_t dataLenBuff[2];
-    uint16_t totalLen = sizeof(float) +  CHECKSUM_SIZE;
+    uint16_t totalLen = sizeof(signed int) +  CHECKSUM_SIZE;
     dataLenBuff[0] = (uint8_t)(totalLen); // LSB first
     dataLenBuff[1] = (uint8_t)(totalLen >> 8);  //MSB after
     
     // Calculate checksum
     ChecksumResetSendingMode();
     ChecksumAppendSendingMode(dataLenBuff, sizeof(dataLenBuff));
-    ChecksumAppendSendingMode(&SDGain, sizeof(SDGain));
+    if(ch == 0)
+        ChecksumAppendSendingMode(&g_LastADCResultCH0, sizeof(g_LastADCResultCH0));
+    else
+        ChecksumAppendSendingMode(&g_LastADCResultCH1, sizeof(g_LastADCResultCH1));
+    
     uint16_t res = ChecksumGetSendingMode();
     
     // Append data to transmit buffer
     AppendDataToTransmitBuffer(dataLenBuff, sizeof(dataLenBuff));
-    AppendDataToTransmitBuffer((uint8_t *)(&SDGain), sizeof(SDGain));
+    if(ch == 0)
+        AppendDataToTransmitBuffer((uint8_t *)(&g_LastADCResultCH0), sizeof(g_LastADCResultCH0));
+    else
+        AppendDataToTransmitBuffer((uint8_t *)(&g_LastADCResultCH1), sizeof(g_LastADCResultCH1));
+    
     AppendDataToTransmitBuffer((uint8_t *)&res, sizeof(res));
     busy = 0;
 }
