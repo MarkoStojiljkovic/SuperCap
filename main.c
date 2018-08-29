@@ -71,6 +71,7 @@ int main(void)
   RCONbits.POR = 0;
   RCONOnStartup = RCONOnStartup; // Dummy instruction to remove warning
   
+  int debugSizeof = sizeof(measureInfo_t);
   
   Init();
     while(1)

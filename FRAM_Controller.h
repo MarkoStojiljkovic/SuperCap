@@ -22,7 +22,7 @@
 #ifndef _FRAM_CONTROLLER_h
 #define _FRAM_CONTROLLER_h
 
-#define MAX_HEADERS 8
+#define MAX_HEADERS 20
 #define MAX_DATA_LENGTH 200
 /*****************************************************************************
  * Include Files
@@ -34,7 +34,7 @@
  * Project Specific Types
  *****************************************************************************/
 
-typedef struct measureInfo //34 bytes
+typedef struct measureInfo // 8 headers -> 34 bytes  , 20 headers -> 82 bytes
 {
   uint16_t numOfSavedMeasurements; //16bit value used for padding
   uint32_t startAddr[MAX_HEADERS]; // Header starting address
