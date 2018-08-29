@@ -111,6 +111,8 @@ static void FailSafeTask()
                 // Disable S1
                 SWITCH_100A_PIN = 0;
                 SWITCH_10A_PIN = 0;
+                // Disable RES discharging
+                RES_EN_PIN = 0;
                 disableDischargingSM = 1;
                 g_failSafeDischargeDelay = TIME_BETWEEN_STAGES_IN_MS;
             }
@@ -141,6 +143,7 @@ static void FailSafeTask()
             {
                 // Disable S1
                 disableChargingSM = 1;
+                // Check if fanox needs to be disabled
                 g_failSafeChargeDelay = TIME_BETWEEN_STAGES_IN_MS;
                 CHARGER_EN_PIN = 0;
             }
