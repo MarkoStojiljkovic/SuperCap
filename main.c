@@ -104,6 +104,7 @@ static void FailSafeTask()
     // Discharger state machine
     switch(disableDischargingSM)
     {
+        // Disable all discharging related stuff, some modules can't be shut down instantly so SM is needed
         case 0:
         {
             if(g_DisableDischarger != 0)
@@ -137,6 +138,7 @@ static void FailSafeTask()
     // Charger state machine
     switch(disableChargingSM)
     {
+        // Disable all charging related stuff, some modules can't be shut down instantly so SM is needed
         case 0:
         {
             if(g_DisableCharger != 0)

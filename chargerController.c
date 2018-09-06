@@ -268,6 +268,8 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
             // Disable S1 for discharger
             SWITCH_100A_PIN = 0;
             SWITCH_10A_PIN = 0;
+            // Disable discharging thru resistor
+            RES_EN_PIN = 0;
             g_chargerControllerDelayBetweenStages = TIME_BETWEEN_STAGES_IN_MS;
             state = 1;
             break;
