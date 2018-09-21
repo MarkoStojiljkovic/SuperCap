@@ -114,21 +114,13 @@ void Init()
     IFS0bits.T1IF = 0; //reset interrupt flag
     IEC0bits.T1IE = 1; //enable T1 interrupt
 
-    // PORT INIT ---------------------------------------
+    // PORT INIT comments are given for 10/100A boards, for 35A board pins are used for different things but OUTPUT/INPUT configurations is the same --------
 
-    // Diods for testing
     TRISEbits.TRISE1 = OUTPUT; //LED
-    //  LATEbits.LATE4=1;
 
     TRISEbits.TRISE2 = OUTPUT; //LED
-    //  LATEbits.LATE5=1;
 
     TRISEbits.TRISE3 = OUTPUT; //LED
-    //  LATEbits.LATE6=1;
-
-    // Debug, TP6 pin
-    TRISBbits.TRISB15 = OUTPUT;
-    TP6_PIN = 0;
 
     // Charger control pins init
     
@@ -142,7 +134,7 @@ void Init()
     TRISEbits.TRISE6 = OUTPUT; // SWITCH_100A_PIN
     TRISEbits.TRISE7 = OUTPUT; // RES_EN_PIN
 
-    TRISDbits.TRISD8 = OUTPUT; // ODRZAVANJE
+    TRISDbits.TRISD8 = OUTPUT; // FAST_CHARGING
 
     // DEV ID PINS
     TRISDbits.TRISD0 = INPUT;       // pin 46
@@ -154,8 +146,13 @@ void Init()
     TRISDbits.TRISD7 = INPUT;       // pin 55
     TRISEbits.TRISE0 = INPUT;       // pin 60
 
+    #if (USE_35_BOARD == 1)
+    REF_100_10_PIN = 0; // This shouldn't be changed in 35A board
+    #endif
+    
+    
             // End port init -----------------------------------
-    ANSB = 0b0000000000000000; //B0,B1 nisu analogni ulazi
+    ANSB = 0b0000000000000000;
     ANSC = 0b0000000000000000;
     ANSD = 0b0000000000000000;
     ANSF = 0b0000000000000000;

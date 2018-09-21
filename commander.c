@@ -341,7 +341,6 @@ static void instructionLedOFF(void) //1
 static void instructionPinSet(void) //2    Sets P6 pin, DEBUG FUNCTION, IGNORE
 {
     currentInstruction++; // point to next loc
-    TP6_PIN = 1;
 }
 
 static void instructionSetDelay(void) //3   Set delay to the commander, loc1 & loc2 & loc3 & loc4 forms 32bit mseconds value
@@ -477,76 +476,51 @@ static void instructionSetCriticalHigh() // 12
 static void instructionPinSetHigh() //13
 {
     currentInstruction++;
-    uint8_t pinId = Get8bValue();
-    switch (pinId)
-    {
-        case 51: RES_EN_PIN = 1;
-            break;
-        case 52: FANOX_EN_PIN = 1;
-            break;
-        case 53: SEL_MEASURE_100_10_PIN = 1;
-            break;
-        case 55: CHARGER_EN_PIN = 1;
-            break;
-        case 60: REF_100_10_PIN = 1;
-            break;
-        case 61: SWITCH_10A_PIN = 1;
-            break;
-        case 62: SWITCH_100A_PIN = 1;
-            break;
-        case 63: DISCH_EN_PIN = 1;
-            break;
-        default: break;
-    }
+    Get8bValue(); // Point to next location
+    // NOT USED
 }
 
 static void instructionPinSetLow() //14
 {
     currentInstruction++;
-    uint8_t pinId = Get8bValue();
-    switch (pinId)
-    {
-        case 51: RES_EN_PIN = 0;
-            break;
-        case 52: FANOX_EN_PIN = 0;
-            break;
-        case 53: SEL_MEASURE_100_10_PIN = 0;
-            break;
-        case 55: CHARGER_EN_PIN = 0;
-            break;
-        case 60: REF_100_10_PIN = 0;
-            break;
-        case 61: SWITCH_10A_PIN = 0;
-            break;
-        case 62: SWITCH_100A_PIN = 0;
-            break;
-        case 63: DISCH_EN_PIN = 0;
-            break;
-        default: break;
-    }
+    Get8bValue(); // Point to next location
+    // NOT USED
 }
 
 static void instructionChargerOn() // 15
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     FANOX_EN_PIN = 0;
     RES_EN_PIN = 0;
     SWITCH_10A_PIN = 0;
     SWITCH_100A_PIN = 0;
     DISCH_EN_PIN = 1; // complementary logic
-    ODRZAVANJE = 1;
+    FAST_CHARGING = 1;
     CHARGER_EN_PIN = 1;
+    #endif
+    
 }
 
 static void instructionChargerOff() // 16
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     CHARGER_EN_PIN = 0;
+    #endif
+    
 }
 
 static void instructionDischarger100AOn() // 17
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     CHARGER_EN_PIN = 0;
     REF_100_10_PIN = 0;
     SEL_MEASURE_100_10_PIN = 1;
@@ -555,6 +529,8 @@ static void instructionDischarger100AOn() // 17
     RES_EN_PIN = 0;
     DISCH_EN_PIN = 0; // complementary logic
     SWITCH_100A_PIN = 1;
+    #endif
+    
 }
 
 // Turning off discharger is composed of 2 stages which should be apart by some time (1s), this is first
@@ -562,7 +538,12 @@ static void instructionDischarger100AOn() // 17
 static void instructionDischarger100AOffS1() //18
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     SWITCH_100A_PIN = 0;
+    #endif
+    
 }
 
 // Stage 2 discharger off instruction
@@ -570,12 +551,20 @@ static void instructionDischarger100AOffS1() //18
 static void instructionDischarger100AOffS2() // 19
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     DISCH_EN_PIN = 1;
+    #endif
+    
 }
 
 static void instructionDischarger10AOn() //20
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     CHARGER_EN_PIN = 0;
     REF_100_10_PIN = 1;
     SEL_MEASURE_100_10_PIN = 0;
@@ -584,6 +573,8 @@ static void instructionDischarger10AOn() //20
     RES_EN_PIN = 0;
     DISCH_EN_PIN = 0;
     SWITCH_10A_PIN = 1;
+    #endif
+    
 }
 
 // Turning off discharger is composed of 2 stages which should be apart by some time (1s), this is first
@@ -591,7 +582,12 @@ static void instructionDischarger10AOn() //20
 static void instructionDischarger10AOffS1() // 21
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     SWITCH_10A_PIN = 0;
+    #endif
+    
 }
 
 // Stage 2 discharger off instruction
@@ -599,41 +595,65 @@ static void instructionDischarger10AOffS1() // 21
 static void instructionDischarger10AOffS2() // 22
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     DISCH_EN_PIN = 1;
+    #endif
 }
 
 static void instructionFanoxOn() // 23
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     CHARGER_EN_PIN = 0;
     SWITCH_100A_PIN = 0;
     DISCH_EN_PIN = 1;
     SWITCH_10A_PIN = 0;
     RES_EN_PIN = 0;
     FANOX_EN_PIN = 1;
+    #endif
+    
 }
 
 static void instructionFanoxOff() //24
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     FANOX_EN_PIN = 0;
+    #endif
+    
 }
 
 static void instructionResOn() // 25
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     CHARGER_EN_PIN = 0;
     SWITCH_100A_PIN = 0;
     DISCH_EN_PIN = 1;
     SWITCH_10A_PIN = 0;
     FANOX_EN_PIN = 0;
     RES_EN_PIN = 1;
+    #endif
+    
 }
 
 static void instructionResOff() // 26
 {
     currentInstruction++;
+    #if (USE_35_BOARD == 1)
+
+    #else
     RES_EN_PIN = 0;
+    #endif
+    
 }
 
 static void instructionGetLastSample() // 27
@@ -646,13 +666,23 @@ static void instructionGetLastSample() // 27
 static void instructionFastChargingOn() //28
 {
     currentInstruction++;
-    ODRZAVANJE = 1;
+    #if (USE_35_BOARD == 1)
+
+    #else
+    FAST_CHARGING = 1;
+    #endif
+    
 }
 
 static void instructionFastChargingOff() //29
 {
     currentInstruction++;
-    ODRZAVANJE = 0; // Miksa je imenovao pin
+    #if (USE_35_BOARD == 1)
+
+    #else
+    FAST_CHARGING = 0;
+    #endif
+    
 }
 
 static void instructionSendACK() // 30

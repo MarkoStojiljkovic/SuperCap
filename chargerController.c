@@ -264,12 +264,16 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
     {
         case 0:
         {
+            #if (USE_35_BOARD == 1)
+            #else
+            // Disable charger
             CHARGER_EN_PIN = 0;
             // Disable S1 for discharger
             SWITCH_100A_PIN = 0;
             SWITCH_10A_PIN = 0;
             // Disable discharging thru resistor
             RES_EN_PIN = 0;
+            #endif
             g_chargerControllerDelayBetweenStages = TIME_BETWEEN_STAGES_IN_MS;
             state = 1;
             break;
@@ -278,8 +282,11 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
         {
             // When timeout occurs, execute STAGE2 shutdown
             if(g_chargerControllerDelayBetweenStages != 0) break;
+            #if (USE_35_BOARD == 1)
+            #else
             // Disable S2
             DISCH_EN_PIN = 1; // Complementary logic
+            #endif
             state = 0;
             return RESPONSE_READY;
         }

@@ -109,11 +109,16 @@ static void FailSafeTask()
         {
             if(g_DisableDischarger != 0)
             {
+                #if (USE_35_BOARD == 1)
+
+                #else
                 // Disable S1
                 SWITCH_100A_PIN = 0;
                 SWITCH_10A_PIN = 0;
                 // Disable RES discharging
                 RES_EN_PIN = 0;
+                #endif
+                
                 disableDischargingSM = 1;
                 g_failSafeDischargeDelay = TIME_BETWEEN_STAGES_IN_MS;
             }
@@ -128,8 +133,13 @@ static void FailSafeTask()
         }
         case 2:
         {
+            #if (USE_35_BOARD == 1)
+
+            #else
             // Disable S2
             DISCH_EN_PIN = 1; // Complementary logic
+            #endif
+            
             disableDischargingSM = 0;
             break;
         }
@@ -143,11 +153,17 @@ static void FailSafeTask()
         {
             if(g_DisableCharger != 0)
             {
+                #if (USE_35_BOARD == 1)
+
+                #else
                 // Disable S1
+                CHARGER_EN_PIN = 0;
+                #endif
                 disableChargingSM = 1;
                 // Check if fanox needs to be disabled
                 g_failSafeChargeDelay = TIME_BETWEEN_STAGES_IN_MS;
-                CHARGER_EN_PIN = 0;
+                
+                
             }
             break;
         }
@@ -160,7 +176,9 @@ static void FailSafeTask()
         }
         case 2:
         {
-            // Disable S2
+            #if (USE_35_BOARD == 1)
+            #else
+            #endif
             disableChargingSM = 0;
             break;
         }
