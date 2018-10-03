@@ -38,6 +38,7 @@
 int g_DisableDischarger = 0;
 int g_DisableCharger = 0;
 int g_chargerControllerDelayBetweenStages = 0;
+int g_chargerFailSafeTaskDelayVariable = 0;
 /*****************************************************************************
  Declaration of File Scope Variables
  *****************************************************************************/
@@ -61,6 +62,9 @@ static uint8_t selectedChannel = 0;
 static uint8_t currentSampleChannel = 0;
 
 static int syncADCResult = 0; // Set this flag when new sample arrives so wait for value functions don't decide actions on repeated sample
+#if (USE_35_BOARD == 1)
+static int syncChargerFailsafe = 0; // Set this flag when CH1 sample is set to new value
+#endif
 /*****************************************************************************
  Local Function Prototypes - Same order as defined
  *****************************************************************************/
@@ -137,7 +141,9 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
     if (ch == 1)
     {
         // Sample is from CH1, this occurs every 10ms 
-        
+        #if (USE_35_BOARD == 1)
+        syncChargerFailsafe = 1;
+        #endif
         // Discharger fail safe
         if (lastSampledValue < valueLowCH1 && valueLowCH1 != INT16_MIN_VALUE)
         {
@@ -193,6 +199,7 @@ void ChargerControllerFailSafeTask(signed int val, uint8_t ch)
         }
         
     }
+    // Ignore samples from CH0
 }
 
 int ChargerControllerRunToValueUp()
@@ -265,6 +272,12 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
         case 0:
         {
             #if (USE_35_BOARD == 1)
+            // Disable all charging logic
+            EN_CH_SW = 0;
+            EN_CHARGE = 1; // Komplementarna logika
+            DICH_SW_35A = 0;
+//            FANOX_CONTROL = 0;
+            GATE_RES_CONTROL = 0;
             #else
             // Disable charger
             CHARGER_EN_PIN = 0;
@@ -283,6 +296,7 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
             // When timeout occurs, execute STAGE2 shutdown
             if(g_chargerControllerDelayBetweenStages != 0) break;
             #if (USE_35_BOARD == 1)
+            DISABLE_DISCHARGER = 1; // Komplementarna logika
             #else
             // Disable S2
             DISCH_EN_PIN = 1; // Complementary logic
@@ -293,6 +307,67 @@ SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions()
     }
     return RESPONSE_NOT_READY;
 }
+
+#if (USE_35_BOARD == 1 && USE_FALSE_CHARGING_PROTECTION == 1)
+void FalseChargingFailSafeTask()
+{
+    static signed int lastCH1Value = 0;
+    static float lastCH1ValueFloat = 0;
+    const float fTarget = 1500.0;
+    const float gain = 7.8;
+    static int state = 0;
+    
+    if(syncChargerFailsafe == 0) return; // Ignore if there isn't new sample
+    syncChargerFailsafe = 0;
+    // Just to be sure check if sample is from CH1
+    if(currentSampleChannel != 1) return;
+    lastCH1Value = lastSampledValue;
+    // Check if charging is active
+    if(EN_CHARGE_READ == 0 && EN_CH_SW_READ == 1)
+    {
+        // So far, charging is active and we have newest sample from CH1
+        // Convert to milivolts
+        lastCH1ValueFloat =  (lastCH1Value * 3300.0) / 32768.0 * gain;
+        switch(state)
+        {
+            case 0:
+            {
+                if(lastCH1ValueFloat < fTarget)
+                {
+                    g_chargerFailSafeTaskDelayVariable = 1000; // Wait 1 second
+                    state = 1;
+                }
+                break;
+            }
+            case 1:
+            {
+                if(lastCH1ValueFloat > fTarget)
+                {
+                    // This is normal behavior, go to initial state
+                    state = 0;
+                }
+                else
+                {
+                    if(g_chargerFailSafeTaskDelayVariable == 0)
+                    {
+                        // Timeout, voltage didnt reached given threshold, turn off charger and return to initial state
+                        EN_CH_SW = 0;
+                        EN_CHARGE = 1; // Komplementarna logika
+                        state = 0;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        // Reset SM, charging is disabled
+        state = 0;
+    }
+    
+}
+#endif
 /*****************************************************************************
  * Local Functions (Definitions)
  *****************************************************************************/

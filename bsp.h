@@ -33,6 +33,7 @@
 #define OUTPUT 0
 #define INPUT 1
 #define USE_35_BOARD 1
+#define USE_FALSE_CHARGING_PROTECTION 0
 
 
 // DEV ID PINS (INPUTS)
@@ -56,12 +57,16 @@
 // Pinout is different for 100A and 35A board
 #if (USE_35_BOARD == 1)
 // LED-s
-#define LED_RED LATEbits.LATE1 // pin 61, LED1      WRONG PIN
-#define LED_GREEN LATEbits.LATE2 // pin 62 LED2     WRONG PIN
-#define LED_YELLOW LATEbits.LATE3  // pin 63 LED3   WRONG PIN
+#define LED_RED LATEbits.LATE2 // pin 62, LED1
+#define LED_GREEN LATEbits.LATE3 // pin 63 LED2
+#define LED_YELLOW LATEbits.LATE4  // pin 64 LED3
 // Charger pins
 #define EN_CH_SW    LATDbits.LATD8 // pin 42, TP R83, R82
+#define EN_CH_SW_READ   PORTDbits.RD8
 #define EN_CHARGE   LATEbits.LATE1 // pin 61
+#define EN_CHARGE_READ  PORTEbits.RE1 
+
+
 // Discharger pins
 #define DISABLE_DISCHARGER      LATBbits.LATB2 // Komplementarna logika, pin 14, TP na J4 jumper
 #define DICH_SW_35A             LATBbits.LATB3 // pin 13, TP J6 jumper i TP7

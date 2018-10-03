@@ -51,6 +51,9 @@ int ChargerControllerRunToValueDown();
 void ChargerControllerSetTargetValue(signed int val);
 void ChargerControllerSetChannel(uint8_t channel);
 SHUTDOWN_RESPONSE_t ChargerControllerDisableAllActions();
+#if (USE_35_BOARD == 1 && USE_FALSE_CHARGING_PROTECTION == 1)
+void FalseChargingFailSafeTask();
+#endif
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/

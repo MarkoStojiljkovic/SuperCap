@@ -491,7 +491,15 @@ static void instructionChargerOn() // 15
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    // Disable all discharging logic
+    DISABLE_DISCHARGER = 1; // Komplementarna logika
+    FANOX_CONTROL = 0;
+    GATE_RES_CONTROL = 0;
+    DICH_SW_35A = 0;
+    
+    // Enable charger
+    EN_CH_SW = 1;
+    EN_CHARGE = 0; // Komplementarna logika
     #else
     FANOX_EN_PIN = 0;
     RES_EN_PIN = 0;
@@ -508,7 +516,9 @@ static void instructionChargerOff() // 16
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    // Disable charger
+    EN_CH_SW = 0;
+    EN_CHARGE = 1; // Komplementarna logika
     #else
     CHARGER_EN_PIN = 0;
     #endif
@@ -563,7 +573,16 @@ static void instructionDischarger10AOn() //20
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    // This is used for 35A discharging
+    // Disable all charging logic
+    EN_CH_SW = 0;
+    EN_CHARGE = 1; // Komplementarna logika
+    FANOX_CONTROL = 0;
+    GATE_RES_CONTROL = 0;
+    
+    // Enable discharger 35A
+    DISABLE_DISCHARGER = 0; // Komplementarna logika
+    DICH_SW_35A = 1;
     #else
     CHARGER_EN_PIN = 0;
     REF_100_10_PIN = 1;
@@ -583,7 +602,7 @@ static void instructionDischarger10AOffS1() // 21
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    DICH_SW_35A = 0;
     #else
     SWITCH_10A_PIN = 0;
     #endif
@@ -596,7 +615,7 @@ static void instructionDischarger10AOffS2() // 22
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    DISABLE_DISCHARGER = 1;
     #else
     DISCH_EN_PIN = 1;
     #endif
@@ -606,7 +625,14 @@ static void instructionFanoxOn() // 23
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    // Disable all charging logic
+    EN_CH_SW = 0;
+    EN_CHARGE = 1; // Komplementarna logika
+    GATE_RES_CONTROL = 0;
+    DISABLE_DISCHARGER = 1; // Komplementarna logika
+    DICH_SW_35A = 0;
+    
+    FANOX_CONTROL = 1;
     #else
     CHARGER_EN_PIN = 0;
     SWITCH_100A_PIN = 0;
@@ -622,7 +648,7 @@ static void instructionFanoxOff() //24
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    FANOX_CONTROL = 0;
     #else
     FANOX_EN_PIN = 0;
     #endif
@@ -633,7 +659,14 @@ static void instructionResOn() // 25
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    // Disable all charging logic
+    EN_CH_SW = 0;
+    EN_CHARGE = 1; // Komplementarna logika
+    DISABLE_DISCHARGER = 1; // Komplementarna logika
+    DICH_SW_35A = 0;
+    FANOX_CONTROL = 0;
+    
+    GATE_RES_CONTROL = 1;
     #else
     CHARGER_EN_PIN = 0;
     SWITCH_100A_PIN = 0;
@@ -649,7 +682,7 @@ static void instructionResOff() // 26
 {
     currentInstruction++;
     #if (USE_35_BOARD == 1)
-
+    GATE_RES_CONTROL = 0;
     #else
     RES_EN_PIN = 0;
     #endif

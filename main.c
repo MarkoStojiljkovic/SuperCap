@@ -33,6 +33,7 @@
 #include "FRAM_Controller.h"
 #include "dataProvider.h"
 #include "blinky.h"
+#include "chargerController.h"
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
@@ -82,6 +83,9 @@ int main(void)
       FRAMControllerReadTask();
       DataProviderTask();
       BlinkLEDDeviceStatus();
+      #if (USE_35_BOARD == 1 && USE_FALSE_CHARGING_PROTECTION == 1)
+      FalseChargingFailSafeTask();
+      #endif
       Clear_WDT();
     }
 }
@@ -110,7 +114,8 @@ static void FailSafeTask()
             if(g_DisableDischarger != 0)
             {
                 #if (USE_35_BOARD == 1)
-
+                DICH_SW_35A = 0;
+                GATE_RES_CONTROL = 0;
                 #else
                 // Disable S1
                 SWITCH_100A_PIN = 0;
@@ -134,7 +139,7 @@ static void FailSafeTask()
         case 2:
         {
             #if (USE_35_BOARD == 1)
-
+            DISABLE_DISCHARGER = 1; // Komplementarna logika
             #else
             // Disable S2
             DISCH_EN_PIN = 1; // Complementary logic
@@ -154,7 +159,8 @@ static void FailSafeTask()
             if(g_DisableCharger != 0)
             {
                 #if (USE_35_BOARD == 1)
-
+                EN_CH_SW = 0;
+                EN_CHARGE = 1; // Komplementarna logika
                 #else
                 // Disable S1
                 CHARGER_EN_PIN = 0;

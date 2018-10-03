@@ -159,7 +159,6 @@ void Init()
     ANSE = 0b0000000000000000;
     ANSG = 0b0000000000000000;
 
-
     DataRecorderInit(); // WARNING: If 1ms tick appears before this function MCU will go in invalid state :`(
     SD_ADCInit();
     //  DEBUG_INIT_ADC();

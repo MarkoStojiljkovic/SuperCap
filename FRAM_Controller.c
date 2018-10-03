@@ -92,7 +92,7 @@ void FRAMControllerInit()
 //  }
 //  FRAMWriteArray(tempAddress, huge, 1000);
   
-  
+//  FRAMReadArray(0, &info, 1);
   
   FRAMReadArray(FRAM_MEASUREMENT_INFO_BASE, &info, FRAM_MEASUREMENT_INFO_SIZE);
   int offset = info.numOfSavedMeasurements;

@@ -34,5 +34,6 @@ extern int g_failSafeChargeDelay;
 extern int g_failSafeDischargeDelay;
 
 extern int g_chargerControllerDelayBetweenStages;
+extern int g_chargerFailSafeTaskDelayVariable;
 #endif	/* GLOBALS_H */
 

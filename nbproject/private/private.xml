@@ -3,20 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/workspace/SuperCap/checksum.c</file>
-            <file>file:/C:/workspace/SuperCap/UART_interpreter.h</file>
-            <file>file:/C:/workspace/SuperCap/init.c</file>
-            <file>file:/C:/workspace/SuperCap/bsp.c</file>
-            <file>file:/C:/workspace/SuperCap/dataRecorder.c</file>
-            <file>file:/C:/workspace/SuperCap/UART_interpreter.c</file>
-            <file>file:/C:/workspace/SuperCap/dataProvider.h</file>
-            <file>file:/C:/workspace/SuperCap/chargerController.c</file>
-            <file>file:/C:/workspace/SuperCap/main.c</file>
-            <file>file:/C:/workspace/SuperCap/bsp.h</file>
-            <file>file:/C:/workspace/SuperCap/interrupts.c</file>
-            <file>file:/C:/workspace/SuperCap/FRAM_Controller.c</file>
-            <file>file:/C:/workspace/SuperCap/commander.c</file>
-            <file>file:/C:/workspace/SuperCap/dataProvider.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/dataRecorder.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/FRAM_Controller.h</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/commander.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/fram_driver.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/bsp.h</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/chargerController.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/i2c.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/sigmaDeltaADC.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/framLayout.h</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/main.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/dataProvider.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/FRAM_Controller.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/interrupts.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/UART_interpreter.c</file>
+            <file>file:/C:/mplabWorkspace/SuperCap/init.c</file>
         </group>
     </open-files>
 </project-private>
