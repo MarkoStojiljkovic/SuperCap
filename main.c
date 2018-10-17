@@ -122,6 +122,8 @@ static void FailSafeTask()
                 SWITCH_10A_PIN = 0;
                 // Disable RES discharging
                 RES_EN_PIN = 0;
+                // Disable fanox
+                FANOX_EN_PIN = 0;
                 #endif
                 
                 disableDischargingSM = 1;

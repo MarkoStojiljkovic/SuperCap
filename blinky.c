@@ -26,7 +26,7 @@
 /*****************************************************************************
  * Declaration of Global Variables
  *****************************************************************************/
-#define HALF_PERIOD_INTERVAL_IN_MS 1000
+#define HALF_PERIOD_INTERVAL_IN_MS 500
 #define LED LED_RED
 
 

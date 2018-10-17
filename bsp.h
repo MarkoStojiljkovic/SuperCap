@@ -32,7 +32,7 @@
  *****************************************************************************/
 #define OUTPUT 0
 #define INPUT 1
-#define USE_35_BOARD 1
+#define USE_35_BOARD 0
 #define USE_FALSE_CHARGING_PROTECTION 0
 
 
